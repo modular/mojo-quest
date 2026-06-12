@@ -8,17 +8,16 @@ software written in Mojo. The team's issue backlog is full of bugs and small
 features you need to close. You'll write Mojo code in an in-browser IDE,
 and learn the Mojo language one ticket at a time.
 
+However, the issue scenarios are a deliberately simplified to teach basic
+Mojo language concepts — they are **not** a realistic depiction of robot
+software.
+
 Every change is **compiled and executed** on the real Mojo toolchain via the
 [Compiler Explorer](https://godbolt.org) API — a ticket only closes when your
 code builds, runs, and produces the right result.
 
 It's built to feel like a real workflow: a Linear-style issue board, a VS
 Code–style file explorer, and a CodeMirror editor wired to a live compiler.
-
-> [!NOTE]
-> The issue scenarios are a deliberately simplified to teach
-> basic Mojo language concepts — they are **not** a realistic depiction
-> of robot software.
 
 [Learn Mojo now at quest.mojolang.org](https://quest.mojolang.org)
 
