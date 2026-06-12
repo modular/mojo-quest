@@ -1,0 +1,25 @@
+{
+  "name": "mojo-quest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "verify:exercises": "esbuild scripts/verify-exercises.ts --bundle --platform=node --format=esm | node --input-type=module"
+  },
+  "dependencies": {
+    "@codemirror/lang-python": "^6.2.1",
+    "@uiw/react-codemirror": "^4.25.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^8.0.16"
+  }
+}
