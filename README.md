@@ -1,27 +1,51 @@
 # 🔥 Mojo Quest
 
-**Learn [Mojo](https://mojolang.org) by closing tickets at a fictional robotics
-company.**
+**Learn Mojo by closing tickets at a fictional robotics company.**
 
-Mojo Quest is a small browser game. You play a new engineer on the autonomy team
-at **MQ Robotics** — a fictional company building autonomous mobile robots whose
-robot software stack is written in Mojo. The backlog is full of bugs and small
-tasks; you work the queue, fix real Mojo code in an in-browser IDE, and pick up
-the language one ticket at a time.
+Mojo Quest is a small browser game. You're a new engineer on the autonomy team
+at **MQ Robotics**, a fictional company building autonomous mobile robots using
+software written in Mojo. The team's issue backlog is full of bugs and small
+features you need to close. You'll write Mojo code in an in-browser IDE,
+and learn the Mojo language one ticket at a time.
 
-Every fix is **actually compiled and executed** on a real Mojo toolchain via the
+Every change is **compiled and executed** on the real Mojo toolchain via the
 [Compiler Explorer](https://godbolt.org) API — a ticket only closes when your
 code builds, runs, and produces the right result.
 
 It's built to feel like a real workflow: a Linear-style issue board, a VS
 Code–style file explorer, and a CodeMirror editor wired to a live compiler.
 
-> **Note:** The robotics scenarios are a deliberately simplified, engaging
-> backdrop for teaching Mojo language concepts — they are **not** a realistic
-> depiction of how robot software is actually built. Exercises are scoped down
-> to one focused concept each (and some are everyday helper/maintenance tasks
-> rather than real robotics operations), so they should not be read as guidance
-> on building a robotics stack.
+> [!NOTE]
+> The issue scenarios are a deliberately simplified to teach
+> basic Mojo language concepts — they are **not** a realistic depiction
+> of robot software.
+
+[Learn Mojo now at quest.mojolang.org](https://quest.mojolang.org)
+
+## Run it locally
+
+The game is fully usable locally as well. Just clone this repo and
+build it with the following commands.
+
+> [!NOTE]
+> Requires [Node.js](https://nodejs.org) 18+ and internet access (the
+> editor calls the public Compiler Explorer API; no key needed).
+
+Install the dependencies and start the live development server:
+
+```sh
+npm install
+npm run dev
+```
+
+Or compile the production-ready build and serve it:
+
+```sh
+npm run build
+npm run preview
+```
+
+Either way, the app deploys at http://localhost:5173.
 
 ## Gameplay
 
@@ -190,18 +214,6 @@ The compiler/runner lives in [`src/lib/compile.ts`](src/lib/compile.ts) and the
 pass/fail logic in [`src/lib/validate.ts`](src/lib/validate.ts). The pinned
 toolchain is set by `MOJO_COMPILER` in `compile.ts` (see
 `GET https://godbolt.org/api/compilers/mojo` for available versions).
-
-## Run it
-
-Requires [Node.js](https://nodejs.org) 18+ and internet access (the editor calls
-the public Compiler Explorer API; no key needed).
-
-```sh
-npm install      # install dependencies
-npm run dev      # start the dev server (Vite) at http://localhost:5173
-npm run build    # type-check + production build to dist/
-npm run preview  # serve the production build locally
-```
 
 ## Tech
 
