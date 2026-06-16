@@ -5,6 +5,7 @@ import { FileTreePanel } from './components/FileTreePanel'
 import { IssueDetail } from './components/IssueDetail'
 import { EditorPanel } from './components/EditorPanel'
 import { Landing } from './components/Landing'
+import { Completion } from './components/Completion'
 import { setSoundEnabled, playResolved, playFanfare } from './lib/sound'
 
 const STARTED_KEY = 'mojo-quest/started'
@@ -25,6 +26,9 @@ export function App() {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'),
   )
+  // When every ticket is closed we show a send-off page; "Back to the board"
+  // flips this so the player can still review their completed tickets.
+  const [reviewing, setReviewing] = useState(false)
   const timer = useRef<number | undefined>(undefined)
 
   const notify = useCallback((message: string) => {
@@ -50,6 +54,7 @@ export function App() {
     } catch {
       /* ignore quota / private-mode errors */
     }
+    setReviewing(false)
     setStarted(false)
   }, [game])
 
@@ -106,6 +111,19 @@ export function App() {
 
   if (!started) {
     return <Landing onStart={startGame} />
+  }
+
+  // Every ticket closed: show the send-off until the player chooses to review.
+  const allComplete =
+    game.issues.length > 0 && game.completedIds.size === game.issues.length
+  if (allComplete && !reviewing) {
+    return (
+      <Completion
+        total={game.issues.length}
+        onReview={() => setReviewing(true)}
+        onReset={resetToLanding}
+      />
+    )
   }
 
   return (

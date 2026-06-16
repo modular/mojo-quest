@@ -8,8 +8,8 @@ software written in Mojo. The team's issue backlog is full of bugs and small
 features you need to close. You'll write Mojo code in an in-browser IDE,
 and learn the Mojo language one ticket at a time.
 
-However, the issue scenarios are a deliberately simplified to teach basic
-Mojo language concepts — they are **not** a realistic depiction of robot
+However, the issue scenarios are deliberately simplified to teach basic
+Mojo language concepts. They are **not** a realistic depiction of robot
 software.
 
 Every change is **compiled and executed** on the real Mojo toolchain via the
@@ -37,7 +37,7 @@ npm install
 npm run dev
 ```
 
-Or compile the production-ready build and serve it:
+Or compile the production build and serve it:
 
 ```sh
 npm run build
@@ -100,6 +100,7 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-108** — optional arguments with default values.
 - **MQ-109** — keyword-only arguments after a bare `*`.
 - **MQ-110** — variadic arguments (`*args`).
+- **MQ-111** — `pass` as a no-op placeholder for an empty block body.
 - **MQ-113** — function overloading by argument type.
 - **MQ-115** — propagating errors with the `raises` keyword.
 
@@ -136,6 +137,7 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-320** — the `if` statement.
 - **MQ-321** — the `while` loop.
 - **MQ-322** — `for` loops and `continue`.
+- **MQ-323** — multi-way branching with `elif`.
 - **MQ-324** — `range(start, stop, step)`.
 - **MQ-325** — mutating a collection in place with a `ref` loop variable.
 - **MQ-326** — iterating any `collections` type with `for`.
@@ -173,12 +175,13 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-702** — all fields must be initialized by the end of the constructor.
 - **MQ-703** — overloading `__init__`.
 - **MQ-704** — `@implicit` single-argument conversion constructors.
-- **MQ-705** — custom copy constructors (`__init__(out self, *, copy: Self)`).
+- **MQ-705** — the `Copyable` trait and its compiler-synthesized `.copy()`.
 - **MQ-706** — the `ImplicitlyCopyable` trait.
 - **MQ-710** — the `__del__` destructor and ASAP last-use destruction.
 
 ### MQ-8xx — Metaprogramming
 
+- **MQ-801** — declaring a compile-time constant with `comptime`.
 - **MQ-803** — compile-time loop unrolling with `comptime for`.
 - **MQ-810** — parameters (`[]`, compile-time) vs arguments (`()`, run-time).
 - **MQ-812** — parameterized structs (`Buffer[size: Int]`).
@@ -192,7 +195,7 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 
 ### MQ-9xx — Unsafe pointers & testing
 
-- **MQ-901** — allocating heap memory with `UnsafePointer[T].alloc(n)`.
+- **MQ-901** — allocating heap memory with the free function `alloc[T](n)`.
 - **MQ-903** — pointer offset indexing (`ptr[i]`).
 - **MQ-950** — `assert_equal` from the `testing` module.
 - **MQ-951** — the `assert_raises` context manager.
@@ -295,7 +298,7 @@ own `compileAndRun` + `checkSolution` to:
    issue's `validation` (compiles, exits 0, output matches `expectedStdout` /
    source patterns), and
 2. compile + run the `starter` and assert it still **fails** (the puzzle is
-   genuinely broken).
+   broken).
 
 It exits non-zero if anything fails, so it works in CI. Run it after bumping
 `MOJO_COMPILER` in [`src/lib/compile.ts`](src/lib/compile.ts) — or periodically

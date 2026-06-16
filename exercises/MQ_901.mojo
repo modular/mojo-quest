@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Use `UnsafePointer[T].alloc(n)` to allocate uninitialized heap memory for `n` values
+# Mojo concept: Use the free function `alloc[T](n)` to allocate uninitialized heap memory for `n` values
 def main():
     # Stage a single encoder reading in a scratch buffer on the heap.
     ptr = alloc[Int](1)

@@ -10,19 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: The `Sized` trait requires a type to implement `__len__()`, which the built-in `len()` function uses
-struct Track(Sized):
-    var name: String
-    var waypoints: List[Int]
-
-    def __init__(out self, name: String, var waypoints: List[Int]):
-        self.name = name
-        self.waypoints = waypoints^
-
-    def __len__(self) -> Int:
-        return len(self.waypoints)
+# Mojo concept: Use `pass` as a no-op placeholder when a block requires a body but has nothing to do
+def run_self_test():
+    # TODO: implement the real self-test later; this is just a stub
+    pass
 
 
 def main():
-    var t = Track("loop-a", [10, 20, 30, 40, 50])
-    print("len:", len(t))
+    run_self_test()
+    print("self-test stub ran")

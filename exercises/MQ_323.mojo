@@ -10,19 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: The `Sized` trait requires a type to implement `__len__()`, which the built-in `len()` function uses
-struct Track(Sized):
-    var name: String
-    var waypoints: List[Int]
-
-    def __init__(out self, name: String, var waypoints: List[Int]):
-        self.name = name
-        self.waypoints = waypoints^
-
-    def __len__(self) -> Int:
-        return len(self.waypoints)
+# Mojo concept: Use `elif` to add another condition to an `if`, checked only when the earlier branches were false
+def power_mode(level: Int) -> String:
+    if level >= 80:
+        return "boost"
+    elif level >= 30:
+        return "cruise"
+    else:
+        return "sleep"
 
 
 def main():
-    var t = Track("loop-a", [10, 20, 30, 40, 50])
-    print("len:", len(t))
+    print(power_mode(95))
+    print(power_mode(50))
+    print(power_mode(10))

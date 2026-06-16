@@ -104,8 +104,10 @@ def main():
     file: 'src/grid.mojo',
     description:
       "`grid_cells` multiplies an occupancy grid's rows and columns, but its " +
-      'arguments have no types, so the compiler rejects it. Annotate both ' +
-      'arguments as `Int` and add the `Int` return type.\n\n' +
+      'arguments have no types, so the compiler rejects it. A type annotation ' +
+      'declares what kind of value a name holds, written `name: Type`; for a ' +
+      'function you annotate each argument and put the return type after `->`. ' +
+      'Annotate both arguments as `Int` and add the `Int` return type.\n\n' +
       'Example: `def someFunction(a: Int, b: Int) -> Int:`',
     starter: `def grid_cells(rows, cols):
     return rows * cols
@@ -127,7 +129,9 @@ def main():
     file: 'src/ring_buffer.mojo',
     description:
       'When a sensor ring buffer fills up, the ingest loop grows it by doubling ' +
-      'its capacity. `grow_capacity` should return twice its input, but right now ' +
+      'its capacity. A function hands a value back to its caller with the ' +
+      '`return` keyword, declaring the type it returns after `->`. ' +
+      '`grow_capacity` should return twice its input, but right now ' +
       'it returns the value unchanged. Fix the body so `grow_capacity(21)` is ' +
       '`42`.\n\n' +
       'Example:\n```\ndef someFunction(x: Int) -> Int:\n    return x + 1\n```',
@@ -152,8 +156,10 @@ def main():
     docUrl: `${DOCS}/functions/`,
     file: 'src/logging.mojo',
     description:
-      '`log_command` has no documentation. Add a one-line docstring as the first ' +
-      'statement of the function body using triple quotes.\n\n' +
+      '`log_command` has no documentation. A docstring is a string literal in ' +
+      'triple quotes placed as the first statement of a function body, where it ' +
+      'documents what the function does. Add a one-line docstring there using ' +
+      'triple quotes.\n\n' +
       'Example: a short sentence summarizing the function, wrapped in triple quotes.',
     starter: `def log_command(name: String) -> String:
     return "Dispatching command: " + name
@@ -180,8 +186,9 @@ def main():
     description:
       '`set_limits` takes `max_speed` then `max_accel`, but the call passes `5` ' +
       'and `2` positionally — so the speed cap (should be 2) and accel cap (should ' +
-      'be 5) come out swapped. Pass them by keyword so each value lands in the ' +
-      'argument you mean.\n\n' +
+      'be 5) come out swapped. A keyword argument is passed as `name = value`, ' +
+      'which binds it to that argument by name regardless of position. Pass them ' +
+      'by keyword so each value lands in the argument you mean.\n\n' +
       'Example: `some_fn(arg_name=value)`',
     starter: `def set_limits(max_speed: Int, max_accel: Int):
     print("speed:", max_speed, "accel:", max_accel)
@@ -204,7 +211,9 @@ def main():
     description:
       'The motor spin-up helper should take an optional ramp time, but `ramp_ms` ' +
       'has no default, so calling `spin_up(900)` with a single argument will not ' +
-      'compile. Give `ramp_ms` a default value of `100`.\n\n' +
+      'compile. An optional argument carries a default value and may be omitted ' +
+      'by the caller; it must come after any required arguments. Give `ramp_ms` a ' +
+      'default value of `100`.\n\n' +
       'Example: `def some_fn(x: Int, y: Int = 0) -> Int:`',
     starter: `def spin_up(rpm: Int, ramp_ms: Int) -> Int:
     return rpm + ramp_ms
@@ -252,7 +261,9 @@ def main():
     description:
       '`total` should accept any number of `Int` readings and add them up, but ' +
       '`readings` is declared as a single `Int`, so `total(3, 4, 5)` will not ' +
-      'compile. Make `readings` a variadic argument with `*`.\n\n' +
+      'compile. A variadic argument, written `*name`, collects any number of ' +
+      'positional arguments into one iterable you can loop over. Make `readings` ' +
+      'a variadic argument with `*`.\n\n' +
       'Example: `def some_fn(*values: Int) -> Int:`',
     starter: `def total(readings: Int) -> Int:
     var s = 0
@@ -268,6 +279,32 @@ def main():
     hint: 'Prefix the argument with `*` so it collects all the positional arguments into one iterable you can loop over.',
   },
   {
+    id: 'MQ-111',
+    concept: "Use `pass` as a no-op placeholder when a block requires a body but has nothing to do",
+    title: 'Stub out the self-test routine',
+    topic: 'Functions',
+    priority: 'High',
+    docUrl: `${DOCS}/functions/#anatomy-of-a-function`,
+    file: 'src/self_test.mojo',
+    description:
+      'Boot wires in a `run_self_test` routine, but it is not implemented yet ' +
+      'and its body is empty — and an empty block does not compile, because a ' +
+      'comment is not a statement. `pass` is a do-nothing placeholder that ' +
+      'satisfies the required indented block without performing any action. Give ' +
+      'the stub a body of `pass` so the file compiles and boot continues.\n\n' +
+      'Example:\n```\ndef todo():\n    pass\n```',
+    starter: `def run_self_test():
+    # TODO: implement the real self-test later; this is just a stub
+
+
+def main():
+    run_self_test()
+    print("self-test stub ran")
+`,
+    validation: { kind: 'run', expectedStdout: 'self-test stub ran' },
+    hint: 'An indented block cannot be empty, and a comment does not count as a statement. Add the do-nothing placeholder statement (`pass`) as the function body so it compiles.',
+  },
+  {
     id: 'MQ-113',
     concept: "Implement separate versions of a function with different argument types to \"overload\" it",
     title: 'Overload the footprint helper',
@@ -278,7 +315,9 @@ def main():
     description:
       '`footprint` computes a square chassis footprint from one side, but the ' +
       'fleet console also calls it with a width and a height — and that overload ' +
-      'does not exist yet, so the build fails. Add a second `footprint` taking ' +
+      'does not exist yet, so the build fails. Overloading means defining several ' +
+      'functions with the same name but different argument types or counts; Mojo ' +
+      'picks the one that matches each call. Add a second `footprint` taking ' +
       '`(w: Int, h: Int)` that returns `w * h`.\n\n' +
       'Example: two `def`s with the same name but different argument lists.',
     starter: `def footprint(side: Int) -> Int:
@@ -325,8 +364,10 @@ def main():
     docUrl: `${DOCS}/variables/#explicitly-declared-variables`,
     file: 'src/odometry.mojo',
     description:
-      'Our style guide requires explicit variable declarations. The odometry tick ' +
-      'counter is assigned without being declared. Declare it with `var`.\n\n' +
+      'Our style guide requires explicit variable declarations. An ' +
+      'explicitly-declared variable is introduced with the `var` keyword. The ' +
+      'odometry tick counter is assigned without being declared. Declare it with ' +
+      '`var`.\n\n' +
       'Example: `var someName = 0`',
     starter: `def main():
     tick_count = 0
@@ -349,9 +390,11 @@ def main():
     docUrl: `${DOCS}/variables/#explicitly-declared-variables`,
     file: 'src/threshold.mojo',
     description:
-      'This variable is declared on one line and assigned on the next, but with ' +
-      'no initial value Mojo cannot infer its type from a bare `var threshold`, so ' +
-      'the declaration is rejected. Give it an explicit `Int` type annotation.\n\n' +
+      'This variable is declared on one line and assigned on the next — late ' +
+      'initialization, which works only when the declaration carries a type, ' +
+      'since there is no value yet for Mojo to infer one from. With a bare ' +
+      '`var threshold` the type is unknown, so the declaration is rejected. Give ' +
+      'it an explicit `Int` type annotation.\n\n' +
       'Example: `var name: SomeType`',
     starter: `def main():
     var threshold
@@ -370,9 +413,10 @@ def main():
     docUrl: `${DOCS}/variables/#type-annotations`,
     file: 'src/cast.mojo',
     description:
-      'This `Int` variable is initialized from a string literal `"5"`, and Mojo ' +
-      'will not implicitly convert a string to an integer, so it fails to compile. ' +
-      'Assign an integer literal instead.\n\n' +
+      'Mojo variables are strongly typed — a variable holds only values of its ' +
+      'declared type. This `Int` variable is initialized from a string literal ' +
+      '`"5"`, and Mojo will not implicitly convert a string to an integer, so it ' +
+      'fails to compile. Assign an integer literal instead.\n\n' +
       'Example: `var n: Int = 5`',
     starter: `def main():
     var count: Int = "5"
@@ -415,7 +459,9 @@ def main():
     description:
       'Writing through `first` should change the first reading in place, but ' +
       '`var first = readings[0]` binds a *copy*, so the write never reaches the ' +
-      'list and it still prints 10. Bind a reference with `ref` instead.\n\n' +
+      'list and it still prints 10. The `ref name = expr` syntax binds a ' +
+      'reference — an alias to an existing value rather than an owned copy — so ' +
+      'writes reach the original. Bind a reference with `ref` instead.\n\n' +
       'Example: `ref name = container[index]`',
     starter: `def main():
     var readings = [10, 20, 30]
@@ -481,9 +527,10 @@ def main():
     docUrl: `${DOCS}/types/#simd-and-dtype`,
     file: 'src/velocity.mojo',
     description:
-      '`main` uses a `Velocity` type that does not exist yet. Define a ' +
-      '`comptime` type alias named `Velocity` for a 4-lane float32 SIMD vector at ' +
-      'the top of the file.\n\n' +
+      '`main` uses a `Velocity` type that does not exist yet. A `SIMD` value is a ' +
+      'fixed-size vector defined by two parameters: a `DType` (its element type) ' +
+      'and the number of lanes. Define a `comptime` type alias named `Velocity` ' +
+      'for a 4-lane float32 SIMD vector at the top of the file.\n\n' +
       'Example: `comptime SomeVector = SIMD[DType.float64, 8]`',
     starter: `def main():
     var v = Velocity(1.0, 2.0, 3.0, 4.0)
@@ -531,7 +578,9 @@ def main():
     file: 'src/device_tag.mojo',
     description:
       'The fleet registry only accepts uppercase device tags, but `device_tag` ' +
-      'returns the joined string as-is, so it emits `mq-amr`. Call the String ' +
+      'returns the joined string as-is, so it emits `mq-amr`. A `String` is ' +
+      'Mojo’s text type, and it offers operators and methods that return a ' +
+      'transformed copy rather than changing the original. Call the String ' +
       'method that returns an upper-cased copy on the finished tag.\n\n' +
       'Example: `someString.someTransform()` applied to the whole joined result.',
     starter: `def device_tag(family: String, model: String) -> String:
@@ -582,9 +631,11 @@ def main():
     docUrl: `${DOCS}/types/#list`,
     file: 'src/waypoints.mojo',
     description:
-      'The waypoint queue is created as an untyped `List()`, so Mojo cannot infer ' +
-      "its element type and the build fails. We're storing waypoint ids as " +
-      '`Int`s — annotate the element type.\n\n' +
+      'A `List[T]` is a growable, ordered sequence whose elements all share one ' +
+      'type `T`, fixed at compile time. The waypoint queue is created as an ' +
+      'untyped `List()`, so Mojo cannot infer its element type and the build ' +
+      "fails. We're storing waypoint ids as `Int`s — annotate the element " +
+      'type.\n\n' +
       'Example: `var someList = List[SomeType]()`',
     starter: `def main():
     var waypoints = List()
@@ -609,10 +660,12 @@ def main():
       '`Dict[String, Int]` maps a joint id to an angle. You write an entry with ' +
       '`d[key] = value`, read it back with `d[key]`, and count the entries with ' +
       '`len(d)`.\n\n' +
-      'The catch: reading `d[key]` raises if the key is absent, so a key lookup ' +
-      'is a raising call. `main` performs one (`joint_angles["joint_3"]`) but does ' +
-      'not declare that it can raise, so it will not compile. Mark `main` as ' +
-      'raising.\n\n' +
+      'This `main` is incomplete on two counts. First, only `joint_3` is ' +
+      'recorded — add `joint_8` at an angle of `256` with `d[key] = value` so the ' +
+      'map holds two joints. Second, reading `d[key]` raises if the key is ' +
+      'absent, so a key lookup is a raising call; `main` performs one ' +
+      '(`joint_angles["joint_3"]`) but does not declare that it can raise, so it ' +
+      'will not compile. Record the second joint and mark `main` as raising.\n\n' +
       'Example: `def someFunction() raises:`',
     starter: `from std.collections import Dict
 
@@ -620,12 +673,12 @@ def main():
 def main():
     var joint_angles = Dict[String, Int]()
     joint_angles["joint_3"] = 128
-    joint_angles["joint_8"] = 256
+    # TODO: also record joint_8 at an angle of 256
     print("joint angle:", joint_angles["joint_3"])
     print("joints:", len(joint_angles))
 `,
     validation: { kind: 'run', expectedStdout: 'joint angle: 128\njoints: 2' },
-    hint: 'Looking a key up in a `Dict` can fail when the key is absent, so the standard library marks that read as raising. A function that calls something raising must advertise it too — the fix is on the header of `main`, not the dictionary code.',
+    hint: 'Two fixes. Add the missing entry with `joint_angles["joint_8"] = 256`. And because looking a key up in a `Dict` can fail when the key is absent, that read is a raising call — a function that calls something raising must advertise it, so add `raises` to the header of `main`.',
   },
   {
     id: 'MQ-223',
@@ -701,7 +754,8 @@ def main() raises:
     description:
       '`square_area` should return its `side` raised to the power 2, but it ' +
       'multiplies the side by 2 instead of squaring it, so `square_area(4)` ' +
-      'returns 8 instead of 16. Use the exponentiation operator.\n\n' +
+      'returns 8 instead of 16. Exponentiation uses the `**` operator ' +
+      '(`base ** exp`), not a caret. Use the exponentiation operator.\n\n' +
       'Example: `var sq = base ** 2`',
     starter: `def square_area(side: Int) -> Int:
     return side * 2
@@ -723,7 +777,9 @@ def main():
     file: 'src/divmod.mojo',
     description:
       '`split_into_bins` should report how many full bins of 5 fit into 17 ' +
-      'readings (`17 // 5` = 3) and how many are left over (`17 % 5` = 2). But the ' +
+      'readings (`17 // 5` = 3) and how many are left over (`17 % 5` = 2). Floor ' +
+      'division `//` keeps only the whole number of times one value divides ' +
+      'another, while the modulo operator `%` returns the remainder. But the ' +
       'two operators are swapped, so it returns `(2, 3)` and prints ' +
       '`bins: 2 left: 3`. Put floor division `//` on the bin count and remainder ' +
       '`%` on the leftovers.\n\n' +
@@ -748,9 +804,10 @@ def main():
     docUrl: `${DOCS}/operators/#comparison-operators`,
     file: 'src/compare.mojo',
     description:
-      '`battery_low` should count a battery at exactly 20% as low, but it uses a ' +
-      'strict `<`, so 20 is not flagged. Use the operator that also includes the ' +
-      'threshold itself.\n\n' +
+      'Mojo’s comparison operators — `==`, `!=`, `<`, `<=`, `>`, and `>=` — test ' +
+      'two values and return a `Bool`. `battery_low` should count a battery at ' +
+      'exactly 20% as low, but it uses a strict `<`, so 20 is not flagged. Use ' +
+      'the operator that also includes the threshold itself.\n\n' +
       'Example: `value <= limit`',
     starter: `def battery_low(level: Int) -> Bool:
     return level < 20
@@ -772,8 +829,10 @@ def main():
     file: 'src/chained.mojo',
     description:
       '`in_range` should reject a temperature outside the safe band of 0–85, but ' +
-      'it only tests the lower bound, so 90°C reports in-range. Use a chained ' +
-      'comparison to test both bounds at once.\n\n' +
+      'it only tests the lower bound, so 90°C reports in-range. A chained ' +
+      'comparison like `a < b < c` tests several relations at once, equivalent to ' +
+      '`(a < b) and (b < c)`. Use a chained comparison to test both bounds at ' +
+      'once.\n\n' +
       'Example: `lo <= x <= hi`',
     starter: `def in_range(temp: Int) -> Bool:
     return 0 <= temp
@@ -796,7 +855,8 @@ def main():
     description:
       '`status_word` should carry both the READY and ARMED bits, but it ANDs the ' +
       'two flag bits together (clearing everything) instead of ORing them, so the ' +
-      'ARMED test reads false. Combine the flags with bitwise OR.\n\n' +
+      'ARMED test reads false. Bitwise OR (`|`) keeps every bit that is set in ' +
+      'either operand. Combine the flags with bitwise OR.\n\n' +
       'Example: `var flags = A | B`',
     starter: `def status_word(ready: Int, armed: Int) -> Int:
     return ready & armed
@@ -821,8 +881,10 @@ def main():
     file: 'src/preconditions.mojo',
     description:
       'The robot may only drive when it has a position fix AND is calibrated, but ' +
-      '`can_drive` uses `or`, so it would go with either one alone. Use boolean ' +
-      '`and` so both must hold.\n\n' +
+      '`can_drive` uses `or`, so it would go with either one alone. With boolean ' +
+      '`and`, both operands must be truthy; it also short-circuits, skipping the ' +
+      'right side when the left is false. Use boolean `and` so both must ' +
+      'hold.\n\n' +
       'Example: `ready = cond_a and cond_b`',
     starter: `def can_drive(has_fix: Bool, calibrated: Bool) -> Bool:
     return has_fix or calibrated
@@ -844,8 +906,9 @@ def main():
     file: 'src/membership.mojo',
     description:
       '`is_allowed` should report whether a sensor id is in the allow-list, but it ' +
-      'uses `not in`, so it returns the opposite of what we want. Use the ' +
-      'membership operator that tests for presence.\n\n' +
+      'uses `not in`, so it returns the opposite of what we want. The `in` ' +
+      'operator checks whether a collection contains a value, and `not in` is its ' +
+      'negation. Use the membership operator that tests for presence.\n\n' +
       'Example: `value in container`',
     starter: `def is_allowed(sensor_id: Int, allowed: List[Int]) -> Bool:
     return sensor_id not in allowed
@@ -868,8 +931,9 @@ def main():
     file: 'src/ternary.mojo',
     description:
       '`speed_label` chooses its label with C-style ternary syntax ' +
-      '(`cond ? a : b`), which Mojo does not accept. Rewrite it using Mojo’s ' +
-      'conditional expression.\n\n' +
+      '(`cond ? a : b`), which Mojo does not accept. A conditional expression in ' +
+      'Mojo has the form `value_if_true if condition else value_if_false`. ' +
+      'Rewrite it using Mojo’s conditional expression.\n\n' +
       'Example: `value_if_true if condition else value_if_false`',
     starter: `def speed_label(speed: Int) -> String:
     return speed > 10 ? "fast" : "slow"
@@ -891,8 +955,9 @@ def main():
     file: 'src/assign_op.mojo',
     description:
       'The gain should be tripled in place, but the code overwrites it with `3` ' +
-      'instead of multiplying, so it prints 3. Use the compound multiply-assign ' +
-      'operator.\n\n' +
+      'instead of multiplying, so it prints 3. A compound assignment such as ' +
+      '`x *= y` updates the existing value in place, shorthand for `x = x * y`. ' +
+      'Use the compound multiply-assign operator.\n\n' +
       'Example: `value *= factor`',
     starter: `def main():
     var scale = 2
@@ -936,9 +1001,11 @@ def main():
     docUrl: `${DOCS}/control-flow/#the-if-statement`,
     file: 'src/scheduler_route.mojo',
     description:
-      'Tasks behind a deep queue should be routed to the overflow core, but the ' +
-      'comparison is backwards: a queue of 250 is sent to the fast core and a ' +
-      'shallow queue of 40 to overflow. Fix the relational operator.\n\n' +
+      'An `if` statement runs its indented block only when its boolean condition ' +
+      'is `True`. Tasks behind a deep queue should be routed to the overflow ' +
+      'core, but the comparison is backwards: a queue of 250 is sent to the fast ' +
+      'core and a shallow queue of 40 to overflow. Fix the relational ' +
+      'operator.\n\n' +
       'Example: `if someValue > limit:`',
     starter: `def route_task(queue_depth: Int) -> String:
     if queue_depth < 100:
@@ -963,7 +1030,8 @@ def main():
     docUrl: `${DOCS}/control-flow/#the-while-statement`,
     file: 'src/reconnect.mojo',
     description:
-      'This `while` loop adds up the back-off delay across reconnect attempts 1 ' +
+      'A `while` loop repeats its block as long as its boolean condition stays ' +
+      '`True`. This loop adds up the back-off delay across reconnect attempts 1 ' +
       'through 5 (a linear back-off), but `attempt` is never advanced, so it loops ' +
       'forever and times out. Add the increment as the last line of the loop ' +
       'body.\n\n' +
@@ -1004,6 +1072,37 @@ def main():
     hint: 'You want the loop-control statement that abandons only the current iteration and moves on to the next — not the one that exits the loop entirely. Put it where the comment is.',
   },
   {
+    id: 'MQ-323',
+    concept: "Use `elif` to add another condition to an `if`, checked only when the earlier branches were false",
+    title: 'Add the cruise power tier',
+    topic: 'Control Flow',
+    priority: 'High',
+    docUrl: `${DOCS}/control-flow/#the-if-statement`,
+    file: 'src/power_mode.mojo',
+    description:
+      '`power_mode` should pick one of three tiers from the battery `level`, but ' +
+      'it only handles the top tier (`boost`) and the fallback (`sleep`), so a ' +
+      'mid-charge robot at 50 wrongly reports `sleep` instead of `cruise`. An ' +
+      '`elif` branch tests a further condition when the preceding `if` was false ' +
+      '(Mojo spells it `elif`, not `else if`). Add an `elif` between the `if` and ' +
+      'the `else` that returns `cruise` for a level of 30 or more.\n\n' +
+      'Example:\n```\nif a:\n    ...\nelif b:\n    ...\nelse:\n    ...\n```',
+    starter: `def power_mode(level: Int) -> String:
+    if level >= 80:
+        return "boost"
+    else:
+        return "sleep"
+
+
+def main():
+    print(power_mode(95))
+    print(power_mode(50))
+    print(power_mode(10))
+`,
+    validation: { kind: 'run', expectedStdout: 'boost\ncruise\nsleep' },
+    hint: 'The two-way `if`/`else` has no slot for the middle tier, so 50 falls through to `sleep`. Insert an `elif level >= 30:` branch between the `if` and the `else` that returns `cruise`.',
+  },
+  {
     id: 'MQ-324',
     concept: "A range is a sequence of integers generated by `range(start, stop, step)`",
     title: 'Step through every other slot',
@@ -1012,9 +1111,11 @@ def main():
     docUrl: `${DOCS}/control-flow/#iterating-over-a-range`,
     file: 'src/range_step.mojo',
     description:
-      'The loop should visit every other slot (0, 2, 4, 6, 8) and sum them to 20, ' +
-      'but `range(0, 10)` walks every index and sums to 45. Add the step argument ' +
-      'so the range advances by 2.\n\n' +
+      'A `range(start, stop, step)` produces the integers from `start` up to (but ' +
+      'not including) `stop`, advancing by `step`. The loop should visit every ' +
+      'other slot (0, 2, 4, 6, 8) and sum them to 20, but `range(0, 10)` walks ' +
+      'every index and sums to 45. Add the step argument so the range advances by ' +
+      '2.\n\n' +
       'Example: `range(start, stop, step)`',
     starter: `def main():
     var total = 0
@@ -1036,8 +1137,9 @@ def main():
     description:
       'Each reading should be bumped by 10 in place, but a plain `for r in ' +
       'readings` binds a copy of each element, so the list is never changed and ' +
-      'the first value stays 1. Iterate by reference with `ref` so writes reach ' +
-      'the list.\n\n' +
+      'the first value stays 1. Putting `ref` before the loop variable binds each ' +
+      'element by reference rather than copying it, so writes land in the list. ' +
+      'Iterate by reference with `ref`.\n\n' +
       'Example: `for ref item in container:`',
     starter: `def main():
     var readings = [1, 2, 3]
@@ -1057,9 +1159,11 @@ def main():
     docUrl: `${DOCS}/control-flow/#iterating-over-mojo-collections`,
     file: 'src/scan_meter.mojo',
     description:
-      'The scan meter loops over every lidar return but reports only the last one, ' +
-      'because the running total is replaced each pass instead of grown. ' +
-      'Accumulate into the total rather than overwriting it.\n\n' +
+      'Every collection type in the `collections` module supports `for`-loop ' +
+      'iteration, visiting each element in turn. The scan meter loops over every ' +
+      'lidar return but reports only the last one, because the running total is ' +
+      'replaced each pass instead of grown. Accumulate into the total rather than ' +
+      'overwriting it.\n\n' +
       'Example: `acc += item` inside the loop, not `acc = item`.',
     starter: `def total_points(batch: List[Int]) -> Int:
     var total = 0
@@ -1086,7 +1190,9 @@ def main():
     description:
       '`validate_velocity` already raises an `Error` for an out-of-range command, ' +
       'but the compiler complains because the function never declares that it can ' +
-      'raise. Add `raises` to its signature.\n\n' +
+      'raise. A function reports failure by raising — `raise Error("...")` — and ' +
+      'any function that can raise must declare it with `raises` in its ' +
+      'signature. Add `raises` to its signature.\n\n' +
       'Example signature: `def someFunction(x: Int) raises -> Int:`',
     starter: `def validate_velocity(n: Int) -> Int:
     if n <= 0:
@@ -1110,8 +1216,10 @@ def main() raises:
     file: 'src/catch_fallback.mojo',
     description:
       '`checked` raises on a negative reading. `main` calls it with `-1`, so the ' +
-      'program aborts instead of degrading gracefully. Wrap the call in a ' +
-      '`try`/`except` and print `value: 0` on failure.\n\n' +
+      'program aborts instead of degrading gracefully. A `try`/`except` block ' +
+      'runs risky code in the `try`, and if it raises, control jumps to the ' +
+      '`except` block instead of aborting. Wrap the call in a `try`/`except` and ' +
+      'print `value: 0` on failure.\n\n' +
       'Example:\n```\ntry:\n    risky()\nexcept:\n    handle()\n```',
     starter: `def checked(n: Int) raises -> Int:
     if n < 0:
@@ -1195,9 +1303,10 @@ def main():
     docUrl: `${DOCS}/structs/#fields`,
     file: 'src/scan.mojo',
     description:
-      '`LidarScan` is missing its `far_points` field, so `total()` and the ' +
-      'constructor will not compile. Declare the `far_points` field (an `Int`) and ' +
-      'assign it in `__init__`.\n\n' +
+      'A struct stores its data in fields, each declared with `var` and a type ' +
+      'and initialized in the constructor. `LidarScan` is missing its ' +
+      '`far_points` field, so `total()` and the constructor will not compile. ' +
+      'Declare the `far_points` field (an `Int`) and assign it in `__init__`.\n\n' +
       'Example field: `var someField: SomeType`\n' +
       'Example assignment: `self.someField = someField`',
     starter: `struct LidarScan(Copyable, Movable):
@@ -1227,8 +1336,9 @@ def main():
     file: 'src/battery.mojo',
     description:
       '`Battery` stores a charge level but has no `is_low` method, yet `main` ' +
-      'calls `b.is_low()`. Add a method `is_low(self) -> Bool` that returns ' +
-      'whether the charge is below 20.\n\n' +
+      'calls `b.is_low()`. An instance method takes the implicit `self` argument ' +
+      'and acts on one instance of the struct. Add a method ' +
+      '`is_low(self) -> Bool` that returns whether the charge is below 20.\n\n' +
       'Example:\n```\ndef some_method(self) -> Bool:\n    return self.field < limit\n```',
     starter: `struct Battery:
     var charge: Int
@@ -1254,8 +1364,9 @@ def main():
     file: 'src/frame_counter.mojo',
     description:
       "`increment` writes to `self.count`, but it takes `self` immutably, so the " +
-      'compiler rejects the in-place update. A method that modifies its own fields ' +
-      'needs a mutable `self`. Fix the signature.\n\n' +
+      'compiler rejects the in-place update. A method that modifies its own ' +
+      'fields needs a mutable receiver, declared `mut self`. Fix the ' +
+      'signature.\n\n' +
       'Example: `def someMethod(mut self):`',
     starter: `struct FrameCounter(Copyable, Movable):
     var count: Int
@@ -1289,8 +1400,10 @@ def main():
     file: 'src/encoder_static.mojo',
     description:
       '`ticks_per_rev` does not use any instance data, and `main` calls it on the ' +
-      'type itself (`Encoder.ticks_per_rev()`). Without the `@staticmethod` ' +
-      'decorator that type-level call will not compile. Mark it static.\n\n' +
+      'type itself (`Encoder.ticks_per_rev()`). A `@staticmethod` belongs to the ' +
+      'type rather than an instance: it takes no `self` and so cannot read ' +
+      'fields. Without that decorator the type-level call will not compile. Mark ' +
+      'it static.\n\n' +
       'Example:\n```\n@staticmethod\ndef some_method() -> Int:\n    ...\n```',
     starter: `struct Encoder:
     def ticks_per_rev() -> Int:
@@ -1406,8 +1519,9 @@ def main():
     file: 'src/version.mojo',
     description:
       'Comparing two `Version` values with `==` should test their major numbers, ' +
-      'but the struct has no `__eq__`, so `a == b` will not compile. Add the ' +
-      'equality dunder.\n\n' +
+      'but the struct has no `__eq__`, so `a == b` will not compile. Mojo ' +
+      'evaluates `a == b` by calling `a.__eq__(b)`, so `==` works only once the ' +
+      'type defines that dunder. Add the equality dunder.\n\n' +
       'Example:\n```\ndef __eq__(self, other: Self) -> Bool:\n    return self.field == other.field\n```',
     starter: `struct Version(Copyable, Movable):
     var major: Int
@@ -1435,7 +1549,8 @@ def main():
     description:
       'Reading `f[1]` should return the second channel of a `Frame`, but the ' +
       'struct does not define the subscript dunder, so indexing will not compile. ' +
-      'Add `__getitem__` that returns the field for index 0, 1, or 2.\n\n' +
+      'Mojo turns a subscript read `obj[i]` into `obj.__getitem__(i)`, so add ' +
+      '`__getitem__` returning the field for index 0, 1, or 2.\n\n' +
       'Example:\n```\ndef __getitem__(self, i: Int) -> Int:\n    ...\n```',
     starter: `struct Frame(Copyable, Movable):
     var a: Int
@@ -1506,7 +1621,8 @@ def main():
     file: 'src/geometry.mojo',
     description:
       '`main` computes the magnitude of a displacement with `sqrt`, but nothing ' +
-      'imports it, so the name is undefined. Add the import at the top of the ' +
+      'imports it, so the name is undefined. `from module import name` brings a ' +
+      'single member of a module into scope. Add the import at the top of the ' +
       'file.\n\n' +
       'Example: `from std.someModule import someName`',
     starter: `def main():
@@ -1552,9 +1668,11 @@ def main():
     docUrl: `${DOCS}/values/ownership/#transfer-arguments-var-and-`,
     file: 'src/map_loader.mojo',
     description:
-      "`load_map` takes ownership of its `path` (`var path`). We don't need " +
-      '`path` after the call, so transfer ownership into it with the `^` operator ' +
-      'rather than letting the compiler make a copy.\n\n' +
+      "`load_map` takes ownership of its `path` (`var path`). The `^` transfer " +
+      'sigil ends a value’s lifetime and moves ownership into a `var` argument ' +
+      'instead of copying it. We don’t need `path` after the call, so transfer ' +
+      'ownership into the call with `^` rather than letting the compiler make a ' +
+      'copy.\n\n' +
       'Example: `var result = someFunction(someValue^)`',
     starter: `def load_map(var path: String) -> String:
     return path + " (loaded)"
@@ -1582,8 +1700,10 @@ def main():
     file: 'src/pose_shift.mojo',
     description:
       '`shift` adjusts a `Pose` in place, but it takes `p` with the default ' +
-      'read-only convention, so writing `p.x` is rejected. Mark the `Pose` ' +
-      'argument `mut` so the function can mutate the caller’s value.\n\n' +
+      'read-only convention, so writing `p.x` is rejected. A `mut` argument is a ' +
+      'mutable reference to the caller’s value, so changes inside the function ' +
+      'are visible outside it. Mark the `Pose` argument `mut` so the function can ' +
+      'mutate the caller’s value.\n\n' +
       'Example: `def some_fn(mut p: SomeStruct):`',
     starter: `struct Pose(Copyable, Movable):
     var x: Int
@@ -1613,6 +1733,8 @@ def main():
     docUrl: `${DOCS}/values/lifetimes/#ref-return-values`,
     file: 'src/command_queue.mojo',
     description:
+      'A `ref` return type hands back a reference to existing storage rather than ' +
+      'a copy, and must name the origin it borrows from. ' +
       "`borrow_depth` returns a mutable `ref` so callers can edit the queue's " +
       '`depth` in place, but the origin in the return type names the whole `self` ' +
       'instead of the field actually returned, so the borrow checker rejects it. ' +
@@ -1734,18 +1856,20 @@ def main():
   },
   {
     id: 'MQ-705',
-    concept: "Define a copy constructor with `def __init__(out self, *, copy: Self)` to control how a value is copied",
+    concept: "Conforming to `Copyable` gives a type a compiler-synthesized `.copy()` method",
     title: 'Give ScanBuffer an independent copy',
     topic: 'Value Lifecycle',
     priority: 'High',
     docUrl: `${DOCS}/lifecycle/life/#copy-constructor`,
     file: 'src/scan_buffer.mojo',
     description:
-      'Each `ScanBuffer` should be safe to clone, but the struct declares no way ' +
-      'to be copied, so `snapshot.copy()` will not compile. Make the struct ' +
-      'copyable and add a copy constructor that builds a fresh, independent copy ' +
-      'of the wrapped list (so edits to one buffer never leak into the other).\n\n' +
-      'Example:\n```\nstruct Wrapper(Copyable):\n    var items: List[Int]\n\n    def __init__(out self, *, copy: Self):\n        self.items = copy.items.copy()\n```',
+      'Each `ScanBuffer` should be safe to clone, but the struct conforms to no ' +
+      'traits, so it has no `.copy()` method and `snapshot.copy()` will not ' +
+      'compile. Conforming to `Copyable` makes the compiler synthesize one: it ' +
+      'copies each field, and because copying a `List` duplicates its contents, ' +
+      'the two buffers stay independent (an edit to one never leaks into the ' +
+      'other). Add the `Copyable` trait to the struct.\n\n' +
+      'Example: `struct Wrapper(Copyable):`',
     starter: `struct ScanBuffer:
     var samples: List[Int]
 
@@ -1769,7 +1893,7 @@ def main():
     print("working size:", working.size())
 `,
     validation: { kind: 'run', expectedStdout: 'snapshot size: 3\nworking size: 4' },
-    hint: 'The recorder asks the buffer for a copy of itself, but the buffer never declared it can be copied. Mark the struct copyable and give it a copy constructor (an `__init__` taking a keyword-only `copy: Self`). Inside it, duplicate the wrapped list with its own `.copy()` rather than aliasing the original’s list, so edits never leak between buffers.',
+    hint: 'The recorder asks the buffer for a copy of itself, but the struct never declared it can be copied. Add the `Copyable` trait to the struct header; the compiler then synthesizes a `.copy()` that duplicates each field — including the `List`, which it deep-copies — so the buffers stay independent. No copy constructor needed.',
   },
   {
     id: 'MQ-706',
@@ -1838,6 +1962,35 @@ def main():
     hint: 'The handle announces when it is acquired but never when it is released, so the release line is missing. Mojo runs a struct’s destructor automatically the moment a value leaves scope — add that destructor and have it print the release. Note its `self` must be taken specially as `deinit self`, not a plain `self`.',
   },
   {
+    id: 'MQ-801',
+    concept: "Assign an expression to a compile-time constant with `comptime`, which evaluates it once at compile time",
+    title: 'Bake the control rate in at compile time',
+    topic: 'Metaprogramming',
+    priority: 'High',
+    docUrl: `${DOCS}/metaprogramming/comptime-evaluation/`,
+    file: 'src/control_rate.mojo',
+    description:
+      'The control loop runs at a fixed rate that is fully known when the ' +
+      'firmware is built, so it belongs as a compile-time constant rather than a ' +
+      'runtime value. The `comptime` keyword evaluates an expression at compile ' +
+      'time and binds the result as a constant the compiler folds in (and can ' +
+      'later use where a compile-time value is required, such as a parameter or a ' +
+      '`comptime for` bound). Right now `tick_budget` is declared with `var`, ' +
+      'making it an ordinary runtime variable. Declare it with `comptime` ' +
+      'instead.\n\n' +
+      'Example: `comptime LIMIT = 8 * 60`',
+    starter: `def main():
+    var tick_budget = 50 * 20
+    print("tick budget:", tick_budget)
+`,
+    validation: {
+      kind: 'source',
+      patterns: ['\\bcomptime\\s+tick_budget\\b'],
+      message: 'Declare `tick_budget` as a compile-time constant with the `comptime` keyword.',
+    },
+    hint: 'A value fully known at build time can be a compile-time constant. Swap `var` for `comptime` on the `tick_budget` declaration so the expression is evaluated at compile time rather than at run time.',
+  },
+  {
     id: 'MQ-803',
     concept: "`comptime for` fully unrolls a loop at compile time over a compile-time sequence like `range(LIMIT)`",
     title: 'Unroll the drive-axis loop at compile time',
@@ -1871,9 +2024,11 @@ def main():
     file: 'src/gain.mojo',
     description:
       'This helper multiplies a value by a fixed control gain that should be baked ' +
-      'in at compile time, but `factor` is declared as an ordinary runtime ' +
-      'argument while callers pass it in square brackets — so it will not compile. ' +
-      "Move `factor` into the function's compile-time parameter list.\n\n" +
+      'in at compile time. In Mojo, inputs in square brackets `[]` are ' +
+      'compile-time parameters, while inputs in parentheses `()` are run-time ' +
+      'arguments. Here `factor` is declared as an ordinary runtime argument while ' +
+      'callers pass it in square brackets — so it will not compile. Move ' +
+      "`factor` into the function's compile-time parameter list.\n\n" +
       'Example: `def scaleBy[k: Int](x: Int) -> Int:`',
     starter: `def scale(factor: Int, x: Int) -> Int:
     return x * factor
@@ -1894,9 +2049,11 @@ def main():
     docUrl: `${DOCS}/parameters/#parameterized-structs`,
     file: 'src/buffer_param.mojo',
     description:
-      '`Buffer` is constructed as `Buffer[8]` and its `capacity` method reads ' +
-      '`Self.size`, but the struct never declares a `size` parameter, so neither ' +
-      'compiles. Add a compile-time parameter `[size: Int]` to the struct.\n\n' +
+      'A parameterized struct adds compile-time parameters in `[]` after its ' +
+      'name, like `Buffer[size: Int]`. `Buffer` is constructed as `Buffer[8]` ' +
+      'and its `capacity` method reads `Self.size`, but the struct never declares ' +
+      'a `size` parameter, so neither compiles. Add a compile-time parameter ' +
+      '`[size: Int]` to the struct.\n\n' +
       'Example: `struct Thing[n: Int]:`',
     starter: `struct Buffer(Copyable, Movable):
     def __init__(out self):
@@ -1922,9 +2079,12 @@ def main():
     docUrl: `${DOCS}/traits/#adding-traits-to-structs`,
     file: 'src/sensors.mojo',
     description:
-      '`announce` only accepts types that conform to the `Sensor` trait. `Lidar` ' +
-      'already implements `read`, but it does not declare conformance, so the ' +
-      'call is rejected. Add `Sensor` to its declaration.\n\n' +
+      '`announce` only accepts types that conform to the `Sensor` trait — a set ' +
+      'of method requirements a type promises to meet. A struct declares ' +
+      'conformance by listing the trait in parentheses after its name, and the ' +
+      'compiler then enforces it. `Lidar` already implements `read`, but it does ' +
+      'not declare conformance, so the call is rejected. Add `Sensor` to its ' +
+      'declaration.\n\n' +
       'Example: `struct SomeStruct(SomeTrait):`',
     starter: `trait Sensor:
     def read(self) -> String:
@@ -1960,10 +2120,13 @@ def main():
     docUrl: `${DOCS}/traits/#default-method-implementations`,
     file: 'src/trait_default.mojo',
     description:
-      '`Robot` conforms to `Greeter` but only implements `name`; it relies on ' +
-      '`greet` having a default. Right now `greet` is declared with `...` (no ' +
-      'body), so `Robot` does not satisfy the trait. Give `greet` a default ' +
-      'implementation in the trait.\n\n' +
+      'A trait method can carry a default implementation, which conforming ' +
+      'structs inherit unless they override it. `Robot` conforms to `Greeter` ' +
+      'but only implements `name`; it relies on `greet` having a default. Right ' +
+      'now `greet` is declared with `...` (no body), so `Robot` does not satisfy ' +
+      'the trait. Give `greet` a default implementation in the trait that ' +
+      'returns `"hello "` followed by the robot’s name from `self.name()` — so ' +
+      '`Robot`, whose name is `amr`, prints `hello amr`.\n\n' +
       'Example: a trait method may have a real body that conformers inherit.',
     starter: `trait Greeter:
     def name(self) -> String:
@@ -1986,7 +2149,7 @@ def main():
     print(r.greet())
 `,
     validation: { kind: 'run', expectedStdout: 'hello amr' },
-    hint: 'Replace the `...` in the trait’s `greet` with a real body that builds the greeting from `self.name()`. Conformers then inherit it.',
+    hint: 'Replace the `...` in the trait’s `greet` with a real body — `return "hello " + self.name()`. Conformers then inherit it.',
   },
   {
     id: 'MQ-830',
@@ -1998,22 +2161,25 @@ def main():
     file: 'src/track_sized.mojo',
     description:
       '`len(t)` only works on types that conform to the `Sized` trait by ' +
-      'implementing `__len__`. `Track` does neither, so the call fails. Declare ' +
-      '`Sized` conformance and add a `__len__` returning the track’s count.\n\n' +
+      'implementing `__len__`. `Track` holds a list of waypoints but does ' +
+      'neither, so the call fails. Declare `Sized` conformance and add a ' +
+      '`__len__` that returns the number of waypoints (`len(self.waypoints)`).\n\n' +
       'Example:\n```\nstruct S(Sized):\n    def __len__(self) -> Int:\n        ...\n```',
     starter: `struct Track:
-    var n: Int
+    var name: String
+    var waypoints: List[Int]
 
-    def __init__(out self, n: Int):
-        self.n = n
+    def __init__(out self, name: String, var waypoints: List[Int]):
+        self.name = name
+        self.waypoints = waypoints^
 
 
 def main():
-    var t = Track(5)
+    var t = Track("loop-a", [10, 20, 30, 40, 50])
     print("len:", len(t))
 `,
     validation: { kind: 'run', expectedStdout: 'len: 5' },
-    hint: 'Declare `Sized` conformance on the struct and give it a `__len__` method that returns its count field.',
+    hint: 'Declare `Sized` conformance on the struct and give it a `__len__` method that returns `len(self.waypoints)`.',
   },
   {
     id: 'MQ-835',
@@ -2025,7 +2191,9 @@ def main():
     file: 'src/telemetry_log.mojo',
     description:
       '`log_value` should accept any printable value, but it references a type ' +
-      '`T` that was never introduced, so the build fails. Make it generic over a ' +
+      '`T` that was never introduced, so the build fails. A generic function ' +
+      'takes a type parameter in `[]`, and constraining it with a trait — like ' +
+      '`[T: Writable]` — bounds which types it accepts. Make it generic over a ' +
       '`Writable` type parameter `T`.\n\n' +
       'Example: `def someFunction[T: Writable](value: T):`',
     starter: `# Logs any value the telemetry bus touches, whatever its type.
@@ -2103,11 +2271,14 @@ def main():
     docUrl: `${DOCS}/metaprogramming/reflection/#inspect-a-type`,
     file: 'src/config_inspect.mojo',
     description:
-      'The config inspector reflects over `RobotConfig` with `reflect[...]()` and ' +
-      'should report how many fields it has (3). But it calls a reflection method ' +
-      'that does not exist, so the build fails. Call the method on the reflected ' +
-      'handle that returns the field count.\n\n' +
-      'Example: `reflect[SomeType]().someMethod()` — the count method ends in `_count`.',
+      'Compile-time reflection with `reflect[T]` inspects a type and returns a ' +
+      'handle you can query for its members. The config inspector reflects over ' +
+      '`RobotConfig` with `reflect[...]()` and should report how many fields it ' +
+      'has (3). But it calls a reflection method that does not exist, so the ' +
+      'build fails. Call the method on the reflected handle that returns the ' +
+      'field count.\n\n' +
+      'Example: `reflect[SomeType]().someMethod()`. Check the linked reflection ' +
+      'docs for the accessor that returns the field count.',
     starter: `struct RobotConfig(Copyable, Movable):
     var max_speed: Int
     var wheel_radius: Int
@@ -2124,18 +2295,20 @@ def main():
     print("RobotConfig fields:", r.num_fields())
 `,
     validation: { kind: 'run', expectedStdout: 'RobotConfig fields: 3' },
-    hint: 'The reflected handle has no `num_fields` method — that is the wrong name. Reach for the method on the handle that reports how many fields the struct declares; its name pairs the word `field` with `count` and, like all the reflection accessors, needs its parentheses to be called.',
+    hint: 'The handle has no `num_fields` method — that is the wrong name. Open the linked reflection docs, find the accessor that returns how many fields the struct declares, and call it with parentheses.',
   },
   {
     id: 'MQ-901',
-    concept: "Use `UnsafePointer[T].alloc(n)` to allocate uninitialized heap memory for `n` values",
+    concept: "Use the free function `alloc[T](n)` to allocate uninitialized heap memory for `n` values",
     title: 'Allocate the encoder-sample scratch buffer',
     topic: 'Pointers',
     priority: 'High',
     docUrl: `${DOCS}/pointers/unsafe-pointers/#allocating-memory`,
     file: 'src/scratch.mojo',
     description:
-      'The driver stages a single encoder reading in a one-slot heap buffer: ' +
+      'An `UnsafePointer[T]` is a raw handle to heap memory; you reserve space ' +
+      'for `n` uninitialized values with the free function `alloc[T](n)`. The ' +
+      'driver stages a single encoder reading in a one-slot heap buffer: ' +
       'allocate, initialize the pointee, read it back with `[]`, then destroy and ' +
       'free it. The allocation call uses an API that does not exist in this ' +
       'toolchain, so it will not compile. Use the free allocation function ' +
@@ -2163,9 +2336,10 @@ def main():
     docUrl: `${DOCS}/pointers/unsafe-pointers/#storing-multiple-values`,
     file: 'src/ptr_index.mojo',
     description:
-      'This two-slot heap buffer stores 10 at index 0 and 20 at index 1, then ' +
-      'should print the second slot (20). But it reads index 0, so it prints 10. ' +
-      'Fix the index it dereferences.\n\n' +
+      'When a pointer has space for multiple values, `ptr[i]` accesses the ' +
+      'element at offset `i`. This two-slot heap buffer stores 10 at index 0 and ' +
+      '20 at index 1, then should print the second slot (20). But it reads index ' +
+      '0, so it prints 10. Fix the index it dereferences.\n\n' +
       'Example: `ptr[i]` reads the element at offset `i`.',
     starter: `def main():
     ptr = alloc[Int](2)
@@ -2186,10 +2360,11 @@ def main():
     docUrl: `${DOCS}/errors/`,
     file: 'src/odometry_test.mojo',
     description:
-      'A unit test checks `total_distance(near, far)` with `assert_equal`. ' +
-      'The function is correct, but the expected value in the assertion is wrong, ' +
-      'so the test fails. Keep the `assert_equal` check and correct the expected ' +
-      'total.\n\n' +
+      'A unit test checks `total_distance(near, far)` with `assert_equal`, which ' +
+      'comes from the `testing` module and fails the test unless its two ' +
+      'arguments are equal. The function is correct, but the expected value in ' +
+      'the assertion is wrong, so the test fails. Keep the `assert_equal` check ' +
+      'and correct the expected total.\n\n' +
       'Example: `assert_equal(add(2, 3), 5)` — the expected operand must match the real sum.',
     starter: `from std.testing import assert_equal
 
@@ -2218,9 +2393,11 @@ def main() raises:
     docUrl: `${DOCS}/errors/`,
     file: 'src/test_raises.mojo',
     description:
-      '`clamp` raises on a negative value. The test uses `assert_raises()` to ' +
-      'check that, but it calls `clamp(5)`, which does not raise — so the ' +
-      'assertion itself fails. Call `clamp` with an input that actually raises.\n\n' +
+      '`clamp` raises on a negative value. `assert_raises()` from the `testing` ' +
+      'module is a context manager whose `with` block must raise an error for the ' +
+      'test to pass. The test uses it to check that, but it calls `clamp(5)`, ' +
+      'which does not raise — so the assertion itself fails. Call `clamp` with an ' +
+      'input that actually raises.\n\n' +
       'Example:\n```\nwith assert_raises():\n    risky()\n```',
     starter: `from std.testing import assert_raises
 

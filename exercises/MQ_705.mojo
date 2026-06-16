@@ -10,15 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Define a copy constructor with `def __init__(out self, *, copy: Self)` to control how a value is copied
+# Mojo concept: Conforming to `Copyable` gives a type a compiler-synthesized `.copy()` method
 struct ScanBuffer(Copyable):
     var samples: List[Int]
 
     def __init__(out self, var samples: List[Int]):
         self.samples = samples^
-
-    def __init__(out self, *, copy: Self):
-        self.samples = copy.samples.copy()
 
     def push(mut self, t: Int):
         self.samples.append(t)

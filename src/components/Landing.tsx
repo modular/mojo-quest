@@ -41,13 +41,13 @@ export function Landing({ onStart }: Props) {
           <p className="landing-lede">
             You've just joined the autonomy team at <strong>MQ Robotics</strong>,
             a company building autonomous mobile robots. Their robot software
-            stack is written in Mojo — and the backlog is full. Work the queue,
-            fix real code, and pick up the language one ticket at a time. Every
+            stack is written in Mojo, and the backlog is full. Work the queue,
+            fix broken code, and pick up the language one ticket at a time. Every
             fix is compiled and run on an actual Mojo compiler before it counts.
           </p>
           <p className="landing-disclaimer">
-            Heads up: the robotics scenarios are a deliberately simplified,
-            engaging backdrop for teaching Mojo language concepts — they are{' '}
+            Heads up: the robotics scenarios are a deliberately simplified
+            backdrop for teaching Mojo language concepts. They are{' '}
             <strong>not</strong> a realistic depiction of how robot software is
             actually built.
           </p>

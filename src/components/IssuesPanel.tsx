@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import type { GameState } from '../state/gameState'
 import { IssueCard } from './IssueCard'
+import { ConfirmModal } from './ConfirmModal'
 
 type Props = { game: GameState; onReset: () => void }
 
 export function IssuesPanel({ game, onReset }: Props) {
   const { assigned, backlog, done, selectedIssue } = game
   const total = game.issues.length
+  const [confirmReset, setConfirmReset] = useState(false)
 
   return (
     <section className="panel issues-panel">
@@ -63,18 +66,7 @@ export function IssuesPanel({ game, onReset }: Props) {
       </div>
 
       <footer className="issues-footer">
-        <button
-          className="btn btn--ghost"
-          onClick={() => {
-            if (
-              window.confirm(
-                'Reset all progress? This clears every completed ticket and your saved code, and returns you to the start screen. This cannot be undone.',
-              )
-            ) {
-              onReset()
-            }
-          }}
-        >
+        <button className="btn btn--ghost" onClick={() => setConfirmReset(true)}>
           Reset progress
         </button>
         <div
@@ -91,6 +83,19 @@ export function IssuesPanel({ game, onReset }: Props) {
           />
         </div>
       </footer>
+
+      <ConfirmModal
+        open={confirmReset}
+        title="Reset all progress?"
+        body="This clears every completed ticket and your saved code, and returns you to the start screen. This cannot be undone."
+        confirmLabel="Reset progress"
+        danger
+        onConfirm={() => {
+          setConfirmReset(false)
+          onReset()
+        }}
+        onCancel={() => setConfirmReset(false)}
+      />
     </section>
   )
 }
