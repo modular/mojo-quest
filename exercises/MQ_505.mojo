@@ -10,19 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: A `mut` argument is a mutable reference: changes inside the function are visible outside it
-struct Pose(Copyable, Movable):
-    var x: Int
+# Mojo concept: The `@fieldwise_init` decorator generates a field-wise constructor, so you don't have to write `__init__` by hand
+@fieldwise_init
+struct LidarScan(Copyable, Movable):
+    var near_points: Int
+    var far_points: Int
 
-    def __init__(out self, x: Int):
-        self.x = x
-
-
-def shift(mut p: Pose, dx: Int):
-    p.x += dx
+    def total(self) -> Int:
+        return self.near_points + self.far_points
 
 
 def main():
-    var pose = Pose(10)
-    shift(pose, 5)
-    print("x:", pose.x)
+    var scan = LidarScan(8, 256)
+    print("Total points:", scan.total())

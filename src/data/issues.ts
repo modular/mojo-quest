@@ -416,7 +416,11 @@ def main():
       'Mojo variables are strongly typed — a variable holds only values of its ' +
       'declared type. This `Int` variable is initialized from a string literal ' +
       '`"5"`, and Mojo will not implicitly convert a string to an integer, so it ' +
-      'fails to compile. Assign an integer literal instead.\n\n' +
+      'fails to compile with:\n\n' +
+      '```\n' +
+      'error: cannot implicitly convert \'StringLiteral["5"]\' value to \'Int\'\n' +
+      '```\n\n' +
+      'Assign an integer literal instead.\n\n' +
       'Example: `var n: Int = 5`',
     starter: `def main():
     var count: Int = "5"
@@ -758,7 +762,7 @@ def main():
 
 def cache_lookup(sensor_id: Int) -> Optional[Int]:
     if sensor_id == 7:
-        return Optional(512)
+        return 512
     return None
 
 
@@ -1216,23 +1220,35 @@ def main():
     docUrl: `${DOCS}/errors/#raise-an-error`,
     file: 'src/limits.mojo',
     description:
-      '`validate_velocity` already raises an `Error` for an out-of-range command, ' +
-      'but the compiler complains because the function never declares that it can ' +
-      'raise. A function reports failure by raising — `raise Error("...")` — and ' +
-      'any function that can raise must declare it with `raises` in its ' +
-      'signature. Add `raises` to its signature.\n\n' +
-      'Example signature: `def someFunction(x: Int) raises -> Int:`',
+      '`validate_velocity` should reject a non-positive command, but its bad-input ' +
+      'branch does nothing, and neither it nor `main` is declared `raises`. A ' +
+      'function reports failure by raising — `raise Error("...")` — and any ' +
+      'function that raises (or calls one that does) must declare `raises` in its ' +
+      'signature. Make three fixes: raise an `Error` in the `if n <= 0` branch, ' +
+      'declare `validate_velocity` as `raises`, and declare `main` as `raises` so ' +
+      'it can propagate the error.\n\n' +
+      'Example: `def someFunction(x: Int) raises -> Int:` with `raise Error("...")` in its body.',
     starter: `def validate_velocity(n: Int) -> Int:
     if n <= 0:
-        raise Error("velocity must be positive")
+        pass  # TODO: reject the invalid velocity by raising an Error
     return n
 
 
-def main() raises:
+def main():
     print("Validated:", validate_velocity(256))
 `,
-    validation: { kind: 'run', expectedStdout: 'Validated: 256' },
-    hint: 'A function that contains a `raise` has to advertise it. Declare that this one can raise, right after its argument list and before the return type.',
+    validation: {
+      kind: 'source',
+      patterns: [
+        'validate_velocity\\([^)]*\\)\\s+raises',
+        'def\\s+main\\(\\)\\s+raises',
+        'raise\\s+Error\\(',
+      ],
+      message:
+        'Raise an `Error` in the invalid-velocity branch, and declare both ' +
+        '`validate_velocity` and `main` as `raises`.',
+    },
+    hint: 'Three edits. Replace the placeholder in the `if n <= 0` branch with `raise Error("velocity must be positive")`. Add `raises` to `validate_velocity`\'s signature (after the argument list, before `-> Int`). Then add `raises` to `main` so the error can propagate out of it.',
   },
   {
     id: 'MQ-402',
@@ -1356,7 +1372,7 @@ def main():
   },
   {
     id: 'MQ-502',
-    concept: "Methods that take the implicit `self` argument are instance methods that act on an instance of the struct",
+    concept: "An instance method takes `self` as an explicit first argument, letting it act on a particular instance of the struct",
     title: 'Add the low-battery method',
     topic: 'Structs',
     priority: 'High',
@@ -1364,9 +1380,9 @@ def main():
     file: 'src/battery.mojo',
     description:
       '`Battery` stores a charge level but has no `is_low` method, yet `main` ' +
-      'calls `b.is_low()`. An instance method takes the implicit `self` argument ' +
-      'and acts on one instance of the struct. Add a method ' +
-      '`is_low(self) -> Bool` that returns whether the charge is below 20.\n\n' +
+      'calls `b.is_low()`. An instance method takes `self` as an explicit first ' +
+      'argument, which is how it gets access to that instance’s fields. Add a ' +
+      'method `is_low(self) -> Bool` that returns whether the charge is below 20.\n\n' +
       'Example:\n```\ndef some_method(self) -> Bool:\n    return self.field < limit\n```',
     starter: `struct Battery:
     var charge: Int
@@ -1443,6 +1459,37 @@ def main():
 `,
     validation: { kind: 'run', expectedStdout: 'ppr: 4096' },
     hint: 'Put `@staticmethod` on the line above `def ticks_per_rev()` so it belongs to the type, not an instance.',
+  },
+  {
+    id: 'MQ-505',
+    concept: "The `@fieldwise_init` decorator generates a field-wise constructor, so you don't have to write `__init__` by hand",
+    title: 'Synthesize the LidarScan constructor',
+    topic: 'Structs',
+    priority: 'Medium',
+    docUrl: `${DOCS}/structs/#struct-definition`,
+    file: 'src/scan_fieldwise.mojo',
+    description:
+      'Most structs just need a field-wise constructor — one that takes an ' +
+      'argument per field and assigns each directly. Rather than writing that ' +
+      '`__init__` by hand (as in MQ-501), put the `@fieldwise_init` decorator on ' +
+      'the struct and Mojo generates it for you. `LidarScan` has no constructor, ' +
+      'so `LidarScan(8, 256)` will not compile. Add the decorator so the ' +
+      'field-wise constructor is synthesized.\n\n' +
+      'Example:\n```\n@fieldwise_init\nstruct SomeType:\n    var field: Int\n```',
+    starter: `struct LidarScan(Copyable, Movable):
+    var near_points: Int
+    var far_points: Int
+
+    def total(self) -> Int:
+        return self.near_points + self.far_points
+
+
+def main():
+    var scan = LidarScan(8, 256)
+    print("Total points:", scan.total())
+`,
+    validation: { kind: 'run', expectedStdout: 'Total points: 264' },
+    hint: 'The struct has fields but no constructor, so `LidarScan(8, 256)` has nothing to call. Add `@fieldwise_init` on the line directly above `struct LidarScan` to have Mojo generate a constructor that takes one argument per field.',
   },
   {
     id: 'MQ-507',
@@ -1599,47 +1646,6 @@ def main():
     hint: 'Define the subscript dunder (`__getitem__`) taking an `Int` index and returning the matching field for 0, 1, or 2.',
   },
   {
-    id: 'MQ-514',
-    concept: "A type can't store another instance of itself; use a pointer, which has a fixed size, instead",
-    title: 'Link pose-graph nodes to the previous pose',
-    topic: 'Structs',
-    priority: 'Medium',
-    docUrl: `${DOCS}/structs/reference/#adding-self-referential-pointers`,
-    file: 'src/pose_node.mojo',
-    description:
-      'Each pose-graph node wants to chain back to the previous pose, so it needs ' +
-      'a field of its own type — but declaring that field as the struct itself ' +
-      'will not build, because the type would have no finite size. Refer to the ' +
-      'same type indirectly with a fixed-size `UnsafePointer` instead.\n\n' +
-      '`UnsafePointer[T, origin]` takes an `origin` parameter naming the memory ' +
-      'it may access. The constructor already builds the pointer with ' +
-      '`StaticConstantOrigin` (a simple stand-in, since a new node starts with no ' +
-      'previous pose), so the field must use the same type.\n\n' +
-      'Example: `var link: UnsafePointer[Self, StaticConstantOrigin]` rather than ' +
-      '`var link: SomeStruct`.',
-    starter: `from std.memory import UnsafePointer
-
-
-# A pose-graph node that links to the previous pose in the trajectory.
-struct PoseNode(Copyable, Movable):
-    var pose_id: Int
-    # BUG: a struct cannot contain itself directly.
-    var prev: PoseNode
-
-    def __init__(out self, pose_id: Int):
-        self.pose_id = pose_id
-        # A null pointer is the sentinel for "no previous pose yet".
-        self.prev = UnsafePointer[Self, StaticConstantOrigin]()
-
-
-def main():
-    var node = PoseNode(128)
-    print("pose node:", node.pose_id)
-`,
-    validation: { kind: 'run', expectedStdout: 'pose node: 128' },
-    hint: 'A value cannot physically contain another whole copy of itself — that would need infinite space, which is what the compiler is objecting to. The constructor already builds a same-type `UnsafePointer[Self, StaticConstantOrigin]`; change the field’s declared type to match it, so `prev` holds a pointer to a `PoseNode` rather than a whole `PoseNode`.',
-  },
-  {
     id: 'MQ-520',
     concept: "`from module import name` imports a specific member from a module",
     title: 'Import sqrt from the math module',
@@ -1696,61 +1702,31 @@ def main():
     docUrl: `${DOCS}/values/ownership/#transfer-arguments-var-and-`,
     file: 'src/map_loader.mojo',
     description:
-      "`load_map` takes ownership of its `path` (`var path`). The `^` transfer " +
-      'sigil ends a value’s lifetime and moves ownership into a `var` argument ' +
-      'instead of copying it. We don’t need `path` after the call, so transfer ' +
-      'ownership into the call with `^` rather than letting the compiler make a ' +
-      'copy.\n\n' +
+      '`load_map` takes ownership of its argument (`var cells`). Unlike a ' +
+      '`String`, a `List` is not implicitly copyable, so passing `cells` by plain ' +
+      'copy is rejected:\n\n' +
+      '```\n' +
+      "error: value of type 'List[Int]' cannot be implicitly copied, it does not conform to 'ImplicitlyCopyable'\n" +
+      '```\n\n' +
+      'We don’t need `cells` after the call, so hand ownership to the loader with ' +
+      'the `^` transfer sigil: it ends the variable’s lifetime and moves the value ' +
+      'into the `var` argument instead of copying it.\n\n' +
       'Example: `var result = someFunction(someValue^)`',
-    starter: `def load_map(var path: String) -> String:
-    return path + " (loaded)"
+    starter: `def load_map(var cells: List[Int]) -> Int:
+    return len(cells)
 
 
 def main():
-    var path = String("map.bin")
-    var result = load_map(path)
-    print(result)
+    var cells = [16, 32, 64, 128]
+    var result = load_map(cells)
+    print("map cells loaded:", result)
 `,
     validation: {
       kind: 'source',
-      patterns: ['load_map\\(\\s*path\\s*\\^\\s*\\)'],
+      patterns: ['load_map\\(\\s*cells\\s*\\^\\s*\\)'],
       message: 'Pass ownership into the call using the `^` transfer operator on the argument.',
     },
-    hint: "The loader takes ownership and you don't use the value afterward, so hand it over with the transfer operator instead of letting the compiler copy it.",
-  },
-  {
-    id: 'MQ-603',
-    concept: "A `mut` argument is a mutable reference: changes inside the function are visible outside it",
-    title: 'Let the planner nudge the pose in place',
-    topic: 'Ownership',
-    priority: 'Medium',
-    docUrl: `${DOCS}/values/ownership/#mutable-arguments-mut`,
-    file: 'src/pose_shift.mojo',
-    description:
-      '`shift` adjusts a `Pose` in place, but it takes `p` with the default ' +
-      'read-only convention, so writing `p.x` is rejected. A `mut` argument is a ' +
-      'mutable reference to the caller’s value, so changes inside the function ' +
-      'are visible outside it. Mark the `Pose` argument `mut` so the function can ' +
-      'mutate the caller’s value.\n\n' +
-      'Example: `def some_fn(mut p: SomeStruct):`',
-    starter: `struct Pose(Copyable, Movable):
-    var x: Int
-
-    def __init__(out self, x: Int):
-        self.x = x
-
-
-def shift(p: Pose, dx: Int):
-    p.x += dx
-
-
-def main():
-    var pose = Pose(10)
-    shift(pose, 5)
-    print("x:", pose.x)
-`,
-    validation: { kind: 'run', expectedStdout: 'x: 15' },
-    hint: 'Arguments are read-only by default. Add the `mut` convention to the `Pose` argument so the function can write to its field.',
+    hint: "The loader takes ownership and a `List` won't copy implicitly, so the plain call won't compile. You don't use `cells` afterward — hand it over with the `^` transfer operator (the compiler even suggests it) rather than making an explicit `.copy()`.",
   },
   {
     id: 'MQ-604',
@@ -2070,7 +2046,7 @@ def main():
   },
   {
     id: 'MQ-812',
-    concept: "A parameterized struct adds compile-time parameters in `[]` after its name (e.g. `Buffer[size: Int]`)",
+    concept: "A parameterized struct adds compile-time parameters in `[]` after its name; they are accessible on instances (e.g. `b.size`)",
     title: 'Parameterize the buffer by size',
     topic: 'Parameterization',
     priority: 'Medium',
@@ -2078,10 +2054,11 @@ def main():
     file: 'src/buffer_param.mojo',
     description:
       'A parameterized struct adds compile-time parameters in `[]` after its ' +
-      'name, like `Buffer[size: Int]`. `Buffer` is constructed as `Buffer[8]` ' +
-      'and its `capacity` method reads `Self.size`, but the struct never declares ' +
-      'a `size` parameter, so neither compiles. Add a compile-time parameter ' +
-      '`[size: Int]` to the struct.\n\n' +
+      'name, like `Buffer[size: Int]`. `Buffer` is constructed as `Buffer[8]`, ' +
+      'its `capacity` method reads `Self.size`, and `main` prints `b.size` ' +
+      'directly — but the struct never declares a `size` parameter, so none of ' +
+      'that compiles. Add a compile-time parameter `[size: Int]` to the struct. ' +
+      'Parameters are also accessible on instances as `b.size`.\n\n' +
       'Example: `struct Thing[n: Int]:`',
     starter: `struct Buffer(Copyable, Movable):
     def __init__(out self):
@@ -2094,9 +2071,10 @@ def main():
 def main():
     var b = Buffer[8]()
     print("capacity:", b.capacity())
+    print("size:", b.size)
 `,
-    validation: { kind: 'run', expectedStdout: 'capacity: 8' },
-    hint: 'Add a compile-time parameter list (`[size: Int]`) to the struct header, before the trait list — `Self.size` then resolves.',
+    validation: { kind: 'run', expectedStdout: 'capacity: 8\nsize: 8' },
+    hint: 'Add a compile-time parameter list (`[size: Int]`) to the struct header, before the trait list — `Self.size` and `b.size` then resolve.',
   },
   {
     id: 'MQ-825',
@@ -2211,7 +2189,7 @@ def main():
   },
   {
     id: 'MQ-835',
-    concept: "Constrain a generic parameter with a trait (e.g. `[T: Writable]`) to bound the types it accepts",
+    concept: "`Some[Trait]` is shorthand for a trait-constrained generic parameter; `def f(v: Some[Writable])` is equivalent to `def f[T: Writable](v: T)`",
     title: 'Make the telemetry logger generic',
     topic: 'Generics',
     priority: 'High',
@@ -2219,11 +2197,11 @@ def main():
     file: 'src/telemetry_log.mojo',
     description:
       '`log_value` should accept any printable value, but it references a type ' +
-      '`T` that was never introduced, so the build fails. A generic function ' +
-      'takes a type parameter in `[]`, and constraining it with a trait — like ' +
-      '`[T: Writable]` — bounds which types it accepts. Make it generic over a ' +
-      '`Writable` type parameter `T`.\n\n' +
-      'Example: `def someFunction[T: Writable](value: T):`',
+      '`T` that was never introduced, so the build fails. Fix it by constraining ' +
+      'the argument to the `Writable` trait.\n\n' +
+      'The explicit form declares a named type parameter: ' +
+      '`def log_value[T: Writable](value: T):`. The `Some` shorthand is terser ' +
+      'and equivalent: `def log_value(value: Some[Writable]):`. Either compiles.',
     starter: `# Logs any value the telemetry bus touches, whatever its type.
 def log_value(value: T):
     print("telemetry:", value)
@@ -2234,25 +2212,25 @@ def main():
     log_value("ready")
 `,
     validation: { kind: 'run', expectedStdout: 'telemetry: 42\ntelemetry: ready' },
-    hint: 'You reference a type that was never introduced. Add a type-parameter list in square brackets after the function name and constrain it to the `Writable` trait so the value can be printed.',
+    hint: 'You reference a type that was never introduced. Either add `[T: Writable]` before the argument list and change the argument type to `T`, or use the `Some` shorthand: replace `T` with `Some[Writable]` and drop the `[]` entirely.',
   },
   {
     id: 'MQ-845',
-    concept: "`constrained[cond]()` asserts a condition at compile time; if false, compilation fails",
+    concept: "`comptime assert cond, \"msg\"` asserts a condition at compile time; if false, compilation fails",
     title: 'Guard the motor count',
     topic: 'Constraints',
     priority: 'High',
     docUrl: `${DOCS}/metaprogramming/constraints/#compile-time-assertions`,
     file: 'src/drive_train.mojo',
     description:
-      'The drive train pairs motors left and right, so `make_drive` uses ' +
-      '`constrained[...]()` to reject an odd motor count at compile time. It is ' +
-      'currently instantiated with an odd value, so the build fails. Pick a motor ' +
-      'count the constraint accepts — do not weaken the guard.\n\n' +
+      'The drive train pairs motors left and right, so `make_drive` uses a ' +
+      '`comptime assert` statement to reject an odd motor count at compile time. ' +
+      'It is currently instantiated with an odd value, so the build fails. Pick a ' +
+      'motor count the assertion accepts — do not weaken the guard.\n\n' +
       'Example: `make_drive[someEvenN]()`',
     starter: `def make_drive[num_motors: Int]() -> Int:
     # The drive train must pair motors across an even motor count.
-    constrained[num_motors % 2 == 0, "num_motors must be even"]()
+    comptime assert num_motors % 2 == 0, "num_motors must be even"
     return num_motors * 64
 
 
@@ -2260,7 +2238,7 @@ def main():
     print("Drive slots:", make_drive[7]())
 `,
     validation: { kind: 'run', expectedStdout: 'Drive slots: 512' },
-    hint: 'The `constrained[...]` call is a compile-time assertion: it stops the build whenever its condition is false for the chosen parameter. Read the message, then instantiate the function with a parameter value that satisfies it — do not weaken the guard.',
+    hint: 'The `comptime assert` statement is a compile-time assertion: it stops the build whenever its condition is false for the chosen parameter. Read the message, then instantiate the function with a parameter value that satisfies it — do not weaken the guard.',
   },
   {
     id: 'MQ-852',
@@ -2305,7 +2283,7 @@ def main():
       'has (3). But it calls a reflection method that does not exist, so the ' +
       'build fails. Call the method on the reflected handle that returns the ' +
       'field count.\n\n' +
-      'Example: `reflect[SomeType]().someMethod()`. Check the linked reflection ' +
+      'Example: `comptime r = reflect[SomeType]()`. Check the linked reflection ' +
       'docs for the accessor that returns the field count.',
     starter: `struct RobotConfig(Copyable, Movable):
     var max_speed: Int
@@ -2319,7 +2297,7 @@ def main():
 
 
 def main():
-    var r = reflect[RobotConfig]()
+    comptime r = reflect[RobotConfig]()
     print("RobotConfig fields:", r.num_fields())
 `,
     validation: { kind: 'run', expectedStdout: 'RobotConfig fields: 3' },

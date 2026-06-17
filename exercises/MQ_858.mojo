@@ -23,5 +23,5 @@ struct RobotConfig(Copyable, Movable):
 
 
 def main():
-    var r = reflect[RobotConfig]()
+    comptime r = reflect[RobotConfig]()
     print("RobotConfig fields:", r.field_count())

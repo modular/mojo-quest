@@ -160,14 +160,12 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-511** — unary operators (`__neg__`).
 - **MQ-512** — `__eq__` and the `Equatable` trait.
 - **MQ-513** — subscript reads with `__getitem__`.
-- **MQ-514** — self-referential types via a pointer.
 - **MQ-520** — `from module import name`.
 
 ### MQ-6xx — Value ownership
 
 - **MQ-601** — the `mut` argument convention (write back to the caller).
 - **MQ-602** — transferring into a `var` argument with `^`.
-- **MQ-603** — `mut` arguments as mutable references.
 - **MQ-604** — `ref` return values that name an origin.
 
 ### MQ-7xx — Value lifecycle
@@ -184,12 +182,14 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-801** — declaring a compile-time constant with `comptime`.
 - **MQ-803** — compile-time loop unrolling with `comptime for`.
 - **MQ-810** — parameters (`[]`, compile-time) vs arguments (`()`, run-time).
-- **MQ-812** — parameterized structs (`Buffer[size: Int]`).
+- **MQ-812** — parameterized structs (`Buffer[size: Int]`); parameters are
+  accessible on instances (`b.size`).
 - **MQ-825** — declaring and enforcing trait conformance.
 - **MQ-827** — default method implementations on traits.
 - **MQ-830** — the `Sized` trait and `__len__`.
-- **MQ-835** — trait-constrained generic parameters (`[T: Writable]`).
-- **MQ-845** — compile-time assertions with `constrained[cond]()`.
+- **MQ-835** — trait-constrained generic parameters (`[T: Writable]`) and the
+  `Some[Writable]` shorthand.
+- **MQ-845** — compile-time assertions with `comptime assert cond, "msg"`.
 - **MQ-852** — forcing compile-time evaluation with `comptime`.
 - **MQ-858** — compile-time reflection with `reflect[T]`.
 

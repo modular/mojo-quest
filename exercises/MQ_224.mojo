@@ -16,7 +16,7 @@ from std.collections import Optional
 
 def cache_lookup(sensor_id: Int) -> Optional[Int]:
     if sensor_id == 7:
-        return Optional(512)
+        return 512
     return None
 
 

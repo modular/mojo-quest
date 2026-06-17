@@ -10,9 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Constrain a generic parameter with a trait (e.g. `[T: Writable]`) to bound the types it accepts
+# Mojo concept: `Some[Trait]` is shorthand for a trait-constrained generic parameter; `def f(v: Some[Writable])` is equivalent to `def f[T: Writable](v: T)`
 # Logs any value the telemetry bus touches, whatever its type.
-def log_value[T: Writable](value: T):
+def log_value(value: Some[Writable]):
     print("telemetry:", value)
 
 

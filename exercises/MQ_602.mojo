@@ -11,11 +11,11 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: The `^` transfer sigil ends a variable's lifetime and transfers ownership into a `var` argument
-def load_map(var path: String) -> String:
-    return path + " (loaded)"
+def load_map(var cells: List[Int]) -> Int:
+    return len(cells)
 
 
 def main():
-    var path = String("map.bin")
-    var result = load_map(path^)
-    print(result)
+    var cells = [16, 32, 64, 128]
+    var result = load_map(cells^)
+    print("map cells loaded:", result)
