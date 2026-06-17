@@ -8,7 +8,7 @@ const STEPS: { icon: string; title: string; body: string }[] = [
   {
     icon: '🎫',
     title: 'Pick up a ticket',
-    body: 'Your board lists bugs and tasks in the MQ Robotics codebase. Three are assigned to you at a time — the rest wait in the backlog.',
+    body: 'Your board lists bugs and tasks in the MQ Robotics codebase. Three are assigned to you at a time - the rest wait in the backlog.',
   },
   {
     icon: '📂',
@@ -43,13 +43,13 @@ export function Landing({ onStart }: Props) {
             a company building autonomous mobile robots. Their robot software
             stack is written in Mojo, and the backlog is full. Work the queue,
             fix broken code, and pick up the language one ticket at a time. Every
-            fix is compiled and run on an actual Mojo compiler before it counts.
+            fix is compiled and run on an actual Mojo compiler.
           </p>
           <p className="landing-disclaimer">
             Heads up: the robotics scenarios are a deliberately simplified
             backdrop for teaching Mojo language concepts. They are{' '}
             <strong>not</strong> a realistic depiction of how robot software is
-            actually built.
+            built.
           </p>
           <div className="landing-cta">
             <button className="btn btn--primary landing-start" onClick={onStart}>
@@ -76,9 +76,8 @@ export function Landing({ onStart }: Props) {
           <h2 className="landing-h2">What you'll cover</h2>
           <p className="landing-scope">
             <strong>{issues.length} tickets</strong> that climb the Mojo learning
-            curve — from language basics through value ownership, traits and
-            generics, and SIMD vectors. No prior Mojo required; each fix is a
-            single focused concept.
+            curve: from language basics through value ownership, traits and
+            generics, and SIMD vectors. No prior Mojo required.
           </p>
           <div className="landing-topics">
             {topics.map((t) => (

@@ -26,7 +26,7 @@ export function DayHub({ game, theme, soundOn, onToggleTheme, onToggleSound, onR
     <div className="landing day-hub">
       <header className="app-bar day-hub-bar">
         <span className="app-logo">🔥 Mojo Quest</span>
-        <span className="app-tagline">Pick a day to work</span>
+        <span className="app-tagline">Pick a day and get to work</span>
         <BarActions
           theme={theme}
           soundOn={soundOn}
@@ -37,10 +37,10 @@ export function DayHub({ game, theme, soundOn, onToggleTheme, onToggleSound, onR
 
       <div className="landing-inner">
         <header className="landing-hero day-hub-hero">
-          <h1 className="landing-title">Six days to learn Mojo.</h1>
+          <h1 className="landing-title">Six days to learn Mojo</h1>
           <p className="landing-lede">
             The MQ Robotics backlog is split into six days, each a focused set of
-            tickets. Work them in any order — your progress saves automatically.
+            tickets. Work them in any order - your progress saves automatically.
           </p>
         </header>
 
