@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import type { GameState } from '../state/gameState'
-import { issues } from '../data/issues'
 
 type TreeNode = {
   name: string
@@ -83,12 +82,14 @@ function sectionPath(id: string, file: string): string {
 type Props = { game: GameState }
 
 export function FileTreePanel({ game }: Props) {
+  // Only the open day's files are shown in the explorer.
+  const dayIssues = game.dayIssues
   const tree = useMemo(
     () =>
       buildTree(
-        issues.map((i) => ({ path: sectionPath(i.id, i.file), issueId: i.id })),
+        dayIssues.map((i) => ({ path: sectionPath(i.id, i.file), issueId: i.id })),
       ),
-    [],
+    [dayIssues],
   )
   const activeId = game.selectedIssue?.id ?? null
 

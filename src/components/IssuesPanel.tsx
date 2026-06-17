@@ -7,7 +7,8 @@ type Props = { game: GameState; onReset: () => void }
 
 export function IssuesPanel({ game, onReset }: Props) {
   const { assigned, backlog, done, selectedIssue } = game
-  const total = game.issues.length
+  // Progress is scoped to the open day's tickets.
+  const total = game.dayIssues.length
   const [confirmReset, setConfirmReset] = useState(false)
 
   return (

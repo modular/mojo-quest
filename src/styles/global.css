@@ -910,10 +910,121 @@ body {
   gap: 12px;
 }
 
+/* ================= Day hub (the "main page") ================= */
+/* Back-to-days button carries a text label, so undo the icon-only line-height. */
+.bar-btn--back {
+  line-height: 1;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 4px;
+}
+/* The hub reuses the .landing shell; its header sits flush at the top. */
+.day-hub .day-hub-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.day-hub-hero {
+  margin-top: 8px;
+}
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.day-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 18px 16px;
+  cursor: pointer;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.day-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.day-card.is-complete {
+  border-color: var(--green);
+}
+.day-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.day-card-num {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+}
+.day-card-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #0b1f12;
+  font-size: 12px;
+  font-weight: 800;
+}
+.day-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 12px 0 6px;
+}
+.day-card-blurb {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.day-card-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.day-card-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Day-complete celebratory modal. */
+.modal.day-complete {
+  text-align: center;
+  max-width: 380px;
+}
+.day-complete .modal-actions {
+  justify-content: center;
+  margin-top: 4px;
+}
+.day-complete-emoji {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 860px) {
+  .day-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 620px) {
   .landing-title { font-size: 26px; }
   .landing-steps { grid-template-columns: 1fr; }
   .completion-links { grid-template-columns: 1fr; }
+  .day-grid { grid-template-columns: 1fr; }
 }
 
 /* ---- toast ---- */

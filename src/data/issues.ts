@@ -594,6 +594,34 @@ def main():
     hint: 'The pieces are joined correctly, but the registry only accepts a single case. String has a method that returns an upper-cased copy — apply it to the whole joined tag, watching the parentheses so the entire string is transformed.',
   },
   {
+    id: 'MQ-219',
+    concept: "Index a `List` with `list[i]` to read an element; assign to `list[i]` to replace it in place",
+    title: 'Correct the first waypoint in the path',
+    topic: 'Collections',
+    priority: 'High',
+    docUrl: `${DOCS}/types/#list`,
+    file: 'src/path.mojo',
+    description:
+      'The path planner received a corrected coordinate for the first waypoint, ' +
+      'but the fix code calls `path.append(corrected)` instead of replacing the ' +
+      'existing element. `append` adds a new slot at the end, so the path grows ' +
+      'to four waypoints and `path[0]` still holds the stale value.\n\n' +
+      'Read and write individual elements with the subscript operator: ' +
+      '`path[i]` reads the element at index `i`, and `path[i] = value` replaces ' +
+      'it in place. Fix the code so `path[0]` holds `15` and the list stays ' +
+      'three elements long.\n\n' +
+      'Example: `myList[0] = newValue`',
+    starter: `def main():
+    var path: List[Int] = [10, 20, 30]
+    var corrected = 15
+    path.append(corrected)  # TODO: replace path[0] instead of appending
+    print("first waypoint:", path[0])
+    print("waypoints:", len(path))
+`,
+    validation: { kind: 'run', expectedStdout: 'first waypoint: 15\nwaypoints: 3' },
+    hint: 'Remove the `append` call and write directly to the slot: `path[0] = corrected`.',
+  },
+  {
     id: 'MQ-220',
     concept: "A `Tuple` is an ordered collection; unpack it or index it to get individual values",
     title: 'Unpack the telemetry stats in the right order',
