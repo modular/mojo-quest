@@ -10,7 +10,16 @@
 
 const CE_BASE = 'https://godbolt.org/api/compiler'
 
-/** Pinned Mojo toolchain. See GET /api/compilers/mojo for the full list. */
+/**
+ * Pinned Mojo toolchain. See GET /api/compilers/mojo for the full list.
+ *
+ * This stays pinned to the stable Mojo release that matches the mojolang.org
+ * docs the game links to — deliberately NOT `mojo_nightly`. The exercises must
+ * compile and behave as the docs describe, so do not bump this to track
+ * nightly. `MOJO_COMPILER=mojo_nightly npm run verify:exercises` is an advisory
+ * preview only; bump this constant (and update any affected exercises) as a
+ * deliberate change when the docs move to a new stable release.
+ */
 export const MOJO_COMPILER = 'mojo_1_0_0b1'
 
 /** Human-friendly label for the pinned toolchain (shown in the editor). */

@@ -306,6 +306,15 @@ against `mojo_nightly` — to catch any exercise a Mojo language change has brok
 (a solution that no longer compiles, or whose output drifted). Requires outbound
 access to `godbolt.org`.
 
+The pinned `MOJO_COMPILER` is intentionally a **stable** Mojo release that
+matches the [Mojo Manual](https://mojolang.org/docs/manual/) the tickets link
+to — not `mojo_nightly`. The default run is the guard that keeps every exercise
+correct on that pinned, documented toolchain. The `mojo_nightly` run is
+**advisory only**: it previews which exercises an upcoming release would break,
+so a future re-pin (bumping `MOJO_COMPILER` and updating the affected exercises)
+can be a deliberate, doc-aligned change. Don't bump the pin to nightly just to
+make a preview pass.
+
 ## Deployment
 
 The build is fully static. `vite.config.ts` sets `base: './'` for relative-path
