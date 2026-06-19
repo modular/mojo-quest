@@ -112,7 +112,15 @@ export function EditorPanel({ game, notify, theme }: Props) {
           theme={theme}
           extensions={[python()]}
           onChange={onChange}
-          basicSetup={{ lineNumbers: true, highlightActiveLine: true, tabSize: 4 }}
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLine: true,
+            tabSize: 4,
+            // The editor uses CodeMirror's Python mode as a stand-in for Mojo
+            // (there is no Mojo language package), so its keyword/global
+            // completions are for the wrong language. Disable them.
+            autocompletion: false,
+          }}
         />
       </div>
 
