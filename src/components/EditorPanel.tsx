@@ -77,6 +77,20 @@ export function EditorPanel({ game, notify, theme }: Props) {
     }
   }, [issue, game, notify])
 
+  // Keyboard shortcut: Ctrl+Cmd+Enter (Mac) or Ctrl+Shift+Enter (Win/Linux)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const isMacShortcut = e.ctrlKey && e.metaKey && e.key === 'Enter'
+      const isWinShortcut = e.ctrlKey && e.shiftKey && e.key === 'Enter'
+      if (isMacShortcut || isWinShortcut) {
+        e.preventDefault()
+        run()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [run])
+
   if (!issue) {
     return (
       <section className="panel editor-panel">
@@ -105,7 +119,7 @@ export function EditorPanel({ game, notify, theme }: Props) {
         <span className="editor-path">{issue.file}</span>
       </div>
 
-      <div className="code-editor">
+      <div className="code-editor" data-tour="code-editor">
         <CodeMirror
           value={source}
           height="100%"
@@ -125,7 +139,7 @@ export function EditorPanel({ game, notify, theme }: Props) {
       </div>
 
       <div className="editor-toolbar">
-        <button className="btn btn--primary" onClick={run} disabled={phase === 'running'}>
+        <button className="btn btn--primary" onClick={run} disabled={phase === 'running'} data-tour="run-button">
           {phase === 'running' ? 'Compiling…' : '▶ Run & check'}
         </button>
         <button

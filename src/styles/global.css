@@ -137,18 +137,40 @@ body {
   border-color: var(--text-faint);
 }
 
-/* ---- 3-column layout ---- */
+/* ---- 2-column layout ---- */
 .columns {
   flex: 1;
   display: grid;
-  grid-template-columns: 420px 240px 1fr;
-  /* Bound the single implicit row to the grid's own height. Without this the
-   * row defaults to `auto` (content-sized), so the `height: 100%` chain down
-   * to the editor collapses and tall content grows the page instead of
-   * scrolling inside the editor. `minmax(0, 1fr)` lets children shrink and
-   * scroll. */
+  grid-template-columns: 320px 1fr;
   grid-template-rows: minmax(0, 1fr);
   min-height: 0;
+}
+.columns--issues-collapsed {
+  grid-template-columns: 36px 1fr;
+}
+.issues-panel--collapsed {
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.issues-collapse-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.issues-collapse-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.issues-panel--collapsed .issues-collapse-btn {
+  writing-mode: vertical-rl;
+  padding: 8px 4px;
 }
 .panel {
   display: flex;
@@ -389,6 +411,23 @@ body {
   font-size: 12px;
   color: var(--text);
   overflow-x: auto;
+}
+.day-doc-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: var(--bg-elevated);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.day-doc-links-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+  flex-shrink: 0;
 }
 .issue-detail-actions {
   display: flex;
@@ -1044,4 +1083,60 @@ body {
 @keyframes toast-in {
   from { opacity: 0; transform: translate(-50%, 8px); }
   to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---- guided tour ---- */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.45);
+}
+.tour-spotlight {
+  position: fixed;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  outline: 2.5px solid #f97316;
+  outline-offset: 1px;
+  pointer-events: none;
+  z-index: 1101;
+}
+.tour-tip {
+  position: fixed;
+  z-index: 1102;
+  pointer-events: all;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  animation: modal-pop 0.14s ease-out;
+}
+.tour-tip-step {
+  margin: 0 0 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tour-tip-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.tour-tip-body {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.tour-tip-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.tour-skip {
+  font-size: 12px;
+  color: var(--text-faint);
 }

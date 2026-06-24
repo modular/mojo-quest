@@ -5,10 +5,11 @@ type Props = {
   soundOn: boolean
   onToggleTheme: () => void
   onToggleSound: () => void
+  onStartTour?: () => void
 }
 
 /** Theme and sound toggle buttons, shared by the day hub and the board header. */
-export function BarActions({ theme, soundOn, onToggleTheme, onToggleSound }: Props) {
+export function BarActions({ theme, soundOn, onToggleTheme, onToggleSound, onStartTour }: Props) {
   return (
     <div className="bar-actions">
       <button
@@ -56,6 +57,16 @@ export function BarActions({ theme, soundOn, onToggleTheme, onToggleSound }: Pro
           )}
         </svg>
       </button>
+      {onStartTour && (
+        <button
+          className="bar-btn"
+          onClick={onStartTour}
+          aria-label="Replay tour"
+          title="Replay tour"
+        >
+          ?
+        </button>
+      )}
     </div>
   )
 }

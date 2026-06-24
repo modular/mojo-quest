@@ -68,7 +68,7 @@ export function IssueDetail({ game, onSubmit }: Props) {
   const showConcept = passed || done
 
   return (
-    <section className="panel issue-detail-panel">
+    <section className="panel issue-detail-panel" data-tour="issue-detail">
       <header className="panel-header">
         <span>Active ticket</span>
         <span
@@ -97,6 +97,16 @@ export function IssueDetail({ game, onSubmit }: Props) {
         )}
 
         <div className="issue-desc">{renderDescription(issue.description)}</div>
+        {issue.dayDocUrls && issue.dayDocUrls.length > 0 && (
+          <div className="day-doc-links">
+            <span className="day-doc-links-label">Optional reading</span>
+            {issue.dayDocUrls.map(({ label, url }) => (
+              <a key={url} className="doc-link" href={url} target="_blank" rel="noreferrer">
+                {label} ↗
+              </a>
+            ))}
+          </div>
+        )}
         <div className="issue-detail-actions">
           <span className="issue-file-chip">{issue.file}</span>
           <a className="doc-link" href={issue.docUrl} target="_blank" rel="noreferrer">

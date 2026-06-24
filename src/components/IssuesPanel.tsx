@@ -3,21 +3,46 @@ import type { GameState } from '../state/gameState'
 import { IssueCard } from './IssueCard'
 import { ConfirmModal } from './ConfirmModal'
 
-type Props = { game: GameState; onReset: () => void }
+type Props = { game: GameState; onReset: () => void; collapsed: boolean; onToggleCollapsed: () => void }
 
-export function IssuesPanel({ game, onReset }: Props) {
+export function IssuesPanel({ game, onReset, collapsed, onToggleCollapsed }: Props) {
   const { assigned, backlog, done, selectedIssue } = game
   // Progress is scoped to the open day's tickets.
   const total = game.dayIssues.length
   const [confirmReset, setConfirmReset] = useState(false)
 
+  if (collapsed) {
+    return (
+      <section className="panel issues-panel issues-panel--collapsed">
+        <button
+          className="issues-collapse-btn"
+          onClick={onToggleCollapsed}
+          title="Expand task list"
+          aria-label="Expand task list"
+        >
+          ▶
+        </button>
+      </section>
+    )
+  }
+
   return (
-    <section className="panel issues-panel">
+    <section className="panel issues-panel" data-tour="issues-panel">
       <header className="panel-header">
         <span>MQ Robotics</span>
-        <span className="progress-pill">
-          {done.length}/{total} done
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="progress-pill">
+            {done.length}/{total} done
+          </span>
+          <button
+            className="issues-collapse-btn"
+            onClick={onToggleCollapsed}
+            title="Collapse task list"
+            aria-label="Collapse task list"
+          >
+            ◀
+          </button>
+        </div>
       </header>
 
       <div className="issues-scroll">

@@ -35,6 +35,8 @@ export type Issue = {
   priority: Priority
   /** Deep link into the Mojo manual. */
   docUrl: string
+  /** Reference doc links shown only on the first ticket of each day. */
+  dayDocUrls?: { label: string; url: string }[]
   /** Markdown-ish body: what to do + a short example. */
   description: string
   /** Display path of the file the player edits, e.g. "src/odometry.mojo". */

@@ -39,7 +39,10 @@ export const issues: Issue[] = [
     title: 'Wire up the program entry point',
     topic: 'Language Basics',
     priority: 'Urgent',
-    docUrl: `${DOCS}/functions/`,
+    docUrl: `${DOCS}/basics/#hello-world`,
+    dayDocUrls: [
+      { label: 'Language basics', url: `${DOCS}/basics/` },
+    ],
     file: 'src/boot.mojo',
     description:
       'A Mojo executable starts at `main`. This file defines `boot()` but never ' +
@@ -287,8 +290,8 @@ def main():
     docUrl: `${DOCS}/functions/#anatomy-of-a-function`,
     file: 'src/self_test.mojo',
     description:
-      'Boot wires in a `run_self_test` routine, but it is not implemented yet ' +
-      'and its body is empty — and an empty block does not compile, because a ' +
+      '`run_self_test` is a stub that is not implemented yet, and its body is ' +
+      'empty. An empty block does not compile, because a ' +
       'comment is not a statement. `pass` is a do-nothing placeholder that ' +
       'satisfies the required indented block without performing any action. Give ' +
       'the stub a body of `pass` so the file compiles and boot continues.\n\n' +
@@ -362,6 +365,10 @@ def main():
     topic: 'Variables',
     priority: 'High',
     docUrl: `${DOCS}/variables/#explicitly-declared-variables`,
+    dayDocUrls: [
+      { label: 'Variables', url: `${DOCS}/variables/` },
+      { label: 'Types', url: `${DOCS}/types/` },
+    ],
     file: 'src/odometry.mojo',
     description:
       'Our style guide requires explicit variable declarations. An ' +
@@ -741,26 +748,19 @@ def main():
   },
   {
     id: 'MQ-224',
-    concept: "An `Optional` represents a value that may or may not be present",
-    title: 'Survive a calibration-cache miss',
+    concept: 'An `Optional` represents a value that may or may not be present',
+    title: 'Type a calibration-cache miss',
     topic: 'Options',
     priority: 'High',
     docUrl: `${DOCS}/types/#optional`,
     file: 'src/calib_cache.mojo',
     description:
-      'A sensor lookup either finds a calibration value or finds nothing, so ' +
-      '`cache_lookup` returns an `Optional[Int]`: it holds an `Int` on a hit and ' +
-      'is `None` on a miss — the Optional itself carries the “value or nothing” ' +
-      'distinction. The reporter unwraps both with `.value()`, but calling ' +
-      '`.value()` on an empty Optional crashes at runtime. An Optional is truthy ' +
-      'only when it holds a value, so test each one first: on a hit, unwrap and ' +
-      'print the value; on a miss, print the Optional itself, which renders as ' +
-      '`None` (the real none — not the text `"none"`).\n\n' +
-      'Example:\n```\nif maybe_x:\n    print(maybe_x.value())\nelse:\n    print(maybe_x)  # prints None\n```',
-    starter: `from std.collections import Optional
-
-
-def cache_lookup(sensor_id: Int) -> Optional[Int]:
+      '`cache_lookup` returns a value on a hit and `None` on a miss, but its ' +
+      'return type is `Int` — which cannot hold `None`. Fix it so the function ' +
+      'can return either. You will need to import `Optional` from ' +
+      '`std.collections` and update the return type.\n\n' +
+      'Example:\n```\nfrom std.collections import Optional\n\ndef find(x: Int) -> Optional[Int]:\n    if x > 0:\n        return x\n    return None\n```',
+    starter: `def cache_lookup(sensor_id: Int) -> Int:
     if sensor_id == 7:
         return 512
     return None
@@ -769,11 +769,17 @@ def cache_lookup(sensor_id: Int) -> Optional[Int]:
 def main() raises:
     var hit = cache_lookup(7)
     var miss = cache_lookup(3)
-    print("hit:", hit.value())
-    print("miss:", miss.value())
+    if hit:
+        print('hit:', hit.value())
+    else:
+        print('hit:', hit)
+    if miss:
+        print('miss:', miss.value())
+    else:
+        print('miss:', miss)
 `,
     validation: { kind: 'run', expectedStdout: 'hit: 512\nmiss: None' },
-    hint: 'An `Optional` either holds a value or is `None`. Unwrapping it with `.value()` unconditionally bets there is always something inside, and on a cache miss that bet crashes. Test the Optional first (it is truthy only when occupied): unwrap on a hit, and on a miss print the Optional itself — an empty Optional prints as `None`.',
+    hint: 'The return type `Int` cannot represent “no value”. Import the right type from `std.collections` and use it as a wrapper around `Int` in the return annotation — that tells Mojo the function may return nothing.',
   },
   {
     id: 'MQ-301',
@@ -782,6 +788,10 @@ def main() raises:
     topic: 'Operators',
     priority: 'Medium',
     docUrl: `${DOCS}/operators/#arithmetic-operators`,
+    dayDocUrls: [
+      { label: 'Operators', url: `${DOCS}/operators/` },
+      { label: 'Control flow', url: `${DOCS}/control-flow/` },
+    ],
     file: 'src/exponent.mojo',
     description:
       '`square_area` should return its `side` raised to the power 2, but it ' +
@@ -1345,6 +1355,9 @@ def main():
     topic: 'Structs',
     priority: 'High',
     docUrl: `${DOCS}/structs/#fields`,
+    dayDocUrls: [
+      { label: 'Structs', url: `${DOCS}/structs/` },
+    ],
     file: 'src/scan.mojo',
     description:
       'A struct stores its data in fields, each declared with `var` and a type ' +
@@ -1673,6 +1686,9 @@ def main():
     topic: 'Value Semantics',
     priority: 'High',
     docUrl: `${DOCS}/values/ownership/#mutable-arguments-mut`,
+    dayDocUrls: [
+      { label: 'Values & ownership', url: `${DOCS}/values/` },
+    ],
     file: 'src/odometer.mojo',
     description:
       '`record_sample` adds a wheel-encoder delta to a running `total`, but ' +
@@ -1972,6 +1988,9 @@ def main():
     topic: 'Metaprogramming',
     priority: 'High',
     docUrl: `${DOCS}/metaprogramming/comptime-evaluation/`,
+    dayDocUrls: [
+      { label: 'Metaprogramming', url: `${DOCS}/metaprogramming/` },
+    ],
     file: 'src/control_rate.mojo',
     description:
       'The control loop runs at a fixed rate that is fully known when the ' +

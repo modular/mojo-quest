@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useGameState } from './state/gameState'
 import { IssuesPanel } from './components/IssuesPanel'
-import { FileTreePanel } from './components/FileTreePanel'
 import { IssueDetail } from './components/IssueDetail'
+import { GuidedTour } from './components/GuidedTour'
 import { EditorPanel } from './components/EditorPanel'
 import { Landing } from './components/Landing'
 import { Completion } from './components/Completion'
@@ -15,6 +15,7 @@ import { setSoundEnabled, playResolved, playFanfare } from './lib/sound'
 const STARTED_KEY = 'mojo-quest/started'
 const SOUND_KEY = 'mojo-quest/sound'
 const THEME_KEY = 'mojo-quest/theme'
+const TOUR_KEY = 'mojo-quest/tour-done'
 
 type Theme = 'dark' | 'light'
 
@@ -36,6 +37,16 @@ export function App() {
   // The day whose completion modal is showing (set on closing a day's last
   // ticket). Transient so re-entering a finished day for review doesn't re-pop.
   const [dayCompleteModal, setDayCompleteModal] = useState<number | null>(null)
+  const [issuesCollapsed, setIssuesCollapsed] = useState(false)
+  const [tourActive, setTourActive] = useState(
+    () => localStorage.getItem(TOUR_KEY) !== '1',
+  )
+
+  const startTour = useCallback(() => setTourActive(true), [])
+  const endTour = useCallback(() => {
+    setTourActive(false)
+    try { localStorage.setItem(TOUR_KEY, '1') } catch { /* ignore */ }
+  }, [])
   const timer = useRef<number | undefined>(undefined)
 
   const notify = useCallback((message: string) => {
@@ -151,16 +162,22 @@ export function App() {
             soundOn={soundOn}
             onToggleTheme={toggleTheme}
             onToggleSound={toggleSound}
+            onStartTour={startTour}
           />
         </header>
-        <main className="columns">
-          <IssuesPanel game={game} onReset={resetToLanding} />
-          <FileTreePanel game={game} />
+        <main className={`columns${issuesCollapsed ? ' columns--issues-collapsed' : ''}`}>
+          <IssuesPanel
+            game={game}
+            onReset={resetToLanding}
+            collapsed={issuesCollapsed}
+            onToggleCollapsed={() => setIssuesCollapsed((v) => !v)}
+          />
           <div className="work-column">
             <IssueDetail game={game} onSubmit={submitActive} />
             <EditorPanel game={game} notify={notify} theme={theme} />
           </div>
         </main>
+        {tourActive && <GuidedTour onDone={endTour} />}
         {toast && <div className="toast">{toast}</div>}
         {dayCompleteModal != null && (
           <DayCompleteModal
