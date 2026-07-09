@@ -14,7 +14,7 @@
 def main():
     # Stage a single encoder reading in a scratch buffer on the heap.
     ptr = alloc[Int](1)
-    ptr.init_pointee_copy(99)
+    ptr.unsafe_write(99)
     value = ptr[]
     print("Encoder count:", value)
     ptr.destroy_pointee()
