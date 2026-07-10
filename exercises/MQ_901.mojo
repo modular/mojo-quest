@@ -17,5 +17,5 @@ def main():
     ptr.unsafe_write(99)
     value = ptr[]
     print("Encoder count:", value)
-    ptr.destroy_pointee()
+    ptr.unsafe_deinit_pointee()
     ptr.free()
