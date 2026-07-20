@@ -590,10 +590,11 @@ def main():
     description:
       'The fleet registry only accepts uppercase device tags, but `device_tag` ' +
       'returns the joined string as-is, so it emits `mq-amr`. A `String` is ' +
-      'Mojo’s text type, and it offers operators and methods that return a ' +
+      'Mojo’s text type, and it offers operators that combine strings (`"str" + "str"`) ' +
+      'and transformational methods (`"str".someTransformMethod()`) that return a ' +
       'transformed copy rather than changing the original. Call the String ' +
       'method that returns an upper-cased copy on the finished tag.\n\n' +
-      'Example: `someString.someTransform()` applied to the whole joined result.',
+      'Example: `someString.someTransformMethod()` applied to the whole joined result.',
     starter: `def device_tag(family: String, model: String) -> String:
     return family + "-" + model
 
@@ -1101,7 +1102,7 @@ def main():
       'Every third slot is reserved for the control loop and should be skipped, so ' +
       'the work total comes out to 27. The `if` body is empty — add the statement ' +
       'that jumps to the next loop iteration.\n\n' +
-      'Example (a related loop-control keyword):\n```\nfor i in range(count):\n    if someCondition:\n        break\n```',
+      'Example (a *different* loop-control keyword — check the docs for the one you need):\n```\nfor i in range(count):\n    if someCondition:\n        break\n```',
     starter: `def main():
     var total = 0
     for i in range(1, 10):
