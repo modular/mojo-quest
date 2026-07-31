@@ -18,4 +18,4 @@ def main():
     value = ptr[]
     print("Encoder count:", value)
     ptr.unsafe_deinit_pointee()
-    ptr.free()
+    ptr.unsafe_free()
