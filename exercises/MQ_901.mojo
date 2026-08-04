@@ -13,9 +13,9 @@
 # Mojo concept: Use the free function `alloc[T](n)` to allocate uninitialized heap memory for `n` values
 def main():
     # Stage a single encoder reading in a scratch buffer on the heap.
-    ptr = alloc[Int](1)
+    var ptr = alloc[Int](1)
     ptr.unsafe_write(99)
-    value = ptr[]
+    var value = ptr[]
     print("Encoder count:", value)
     ptr.unsafe_deinit_pointee()
     ptr.unsafe_free()
