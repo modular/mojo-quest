@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: With space for multiple values, `ptr[unsafe_offset=i]` accesses the element at offset `i`
+# Mojo concept: With space for multiple values, `ptr[i]` accesses the element at offset `i`
 def main():
-    var ptr = alloc[Int]({count = 2}).unsafe_leak()
-    ptr[unsafe_offset=0] = 10
-    ptr[unsafe_offset=1] = 20
-    print("second:", ptr[unsafe_offset=1])
-    ptr.unsafe_free()
+    var ptr = alloc[Int](2)
+    ptr[0] = 10
+    ptr[1] = 20
+    print("second:", ptr[1])
+    ptr.free()

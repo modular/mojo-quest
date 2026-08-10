@@ -10,12 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Use the free function `alloc[T]({count = n}).unsafe_leak()` to allocate uninitialized heap memory for `n` values
+# Mojo concept: Use the free function `alloc[T](n)` to allocate uninitialized heap memory for `n` values
 def main():
     # Stage a single encoder reading in a scratch buffer on the heap.
-    var ptr = alloc[Int]({count = 1}).unsafe_leak()
-    ptr.unsafe_write(99)
+    var ptr = alloc[Int](1)
+    ptr[] = 99
     var value = ptr[]
     print("Encoder count:", value)
-    ptr.unsafe_deinit_pointee()
-    ptr.unsafe_free()
+    ptr.free()
