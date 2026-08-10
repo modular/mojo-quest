@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "verify:exercises": "esbuild scripts/verify-exercises.ts --bundle --platform=node --format=esm | node --input-type=module"
+    "verify:exercises": "esbuild scripts/verify-exercises.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/verify-exercises.mjs && node node_modules/.cache/verify-exercises.mjs"
   },
   "dependencies": {
     "@codemirror/lang-python": "^6.2.1",
