@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Mojo calls a value's `__del__()` destructor when its lifetime ends (ASAP, last-use destruction)
+# Mojo concept: Mojo calls a value's `__deinit__()` destructor when its lifetime ends (ASAP, last-use destruction)
 struct MotorHandle:
     var motor_id: Int
 
@@ -18,7 +18,7 @@ struct MotorHandle:
         self.motor_id = motor_id
         print("Acquired motor", self.motor_id)
 
-    def __del__(deinit self):
+    def __deinit__(deinit self):
         print("Released motor", self.motor_id)
 
 

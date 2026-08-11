@@ -12,7 +12,7 @@
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: A variable owns its value; ownership is transferred with the `^` sigil, which leaves the source uninitialized
 def main():
-    var a = [1, 2, 3]
+    var a: List[Int] = [1, 2, 3]
     var b = a.copy()
     a.append(4)
     print("a:", len(a), "b:", len(b))

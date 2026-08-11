@@ -12,7 +12,7 @@
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Use the `ref name` syntax to bind a reference to a value rather than an owned copy
 def main():
-    var readings = [10, 20, 30]
+    var readings: List[Int] = [10, 20, 30]
     ref first = readings[0]
     first = 99
     print("first:", readings[0])

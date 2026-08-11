@@ -30,7 +30,7 @@ const DOCS = 'https://mojolang.org/docs/manual'
  *                (used for idioms that compile identically either way).
  *
  * Every starter and solution is verified against the live Mojo toolchain
- * (mojo_1_0_0b1) via `npm run verify:exercises`.
+ * (mojo_1_0_0) via `npm run verify:exercises`.
  */
 export const issues: Issue[] = [
   {
@@ -451,7 +451,7 @@ def main():
       'instead of moving.\n\n' +
       'Example: `var b = original.copy()` copies; `var b = original^` moves (consumes the original).',
     starter: `def main():
-    var a = [1, 2, 3]
+    var a: List[Int] = [1, 2, 3]
     var b = a^
     a.append(4)
     print("a:", len(a), "b:", len(b))
@@ -475,7 +475,7 @@ def main():
       'writes reach the original. Bind a reference with `ref` instead.\n\n' +
       'Example: `ref name = container[index]`',
     starter: `def main():
-    var readings = [10, 20, 30]
+    var readings: List[Int] = [10, 20, 30]
     var first = readings[0]
     first = 99
     print("first:", readings[0])
@@ -826,7 +826,7 @@ def main():
       'two operators are swapped, so it returns `(2, 3)` and prints ' +
       '`bins: 2 left: 3`. Put floor division `//` on the bin count and remainder ' +
       '`%` on the leftovers.\n\n' +
-      'Example: `count = total // size`, `rest = total % size`',
+      'Example: `var count = total // size`, `var rest = total % size`',
     starter: `def split_into_bins(total: Int, per_bin: Int) -> Tuple[Int, Int]:
     return total % per_bin, total // per_bin
 
@@ -928,7 +928,7 @@ def main():
       '`and`, both operands must be truthy; it also short-circuits, skipping the ' +
       'right side when the left is false. Use boolean `and` so both must ' +
       'hold.\n\n' +
-      'Example: `ready = cond_a and cond_b`',
+      'Example: `var ready = cond_a and cond_b`',
     starter: `def can_drive(has_fix: Bool, calibrated: Bool) -> Bool:
     return has_fix or calibrated
 
@@ -958,7 +958,7 @@ def main():
 
 
 def main():
-    var allowed = [2, 4, 6]
+    var allowed: List[Int] = [2, 4, 6]
     print("ok:", is_allowed(4, allowed))
 `,
     validation: { kind: 'run', expectedStdout: 'ok: True' },
@@ -1185,7 +1185,7 @@ def main():
       'Iterate by reference with `ref`.\n\n' +
       'Example: `for ref item in container:`',
     starter: `def main():
-    var readings = [1, 2, 3]
+    var readings: List[Int] = [1, 2, 3]
     for r in readings:
         r += 10
     print("first:", readings[0])
@@ -1734,7 +1734,7 @@ def main():
 
 
 def main():
-    var cells = [16, 32, 64, 128]
+    var cells: List[Int] = [16, 32, 64, 128]
     var result = load_map(cells)
     print("map cells loaded:", result)
 `,
@@ -1947,7 +1947,7 @@ def main():
   },
   {
     id: 'MQ-710',
-    concept: "Mojo calls a value's `__del__()` destructor when its lifetime ends (ASAP, last-use destruction)",
+    concept: "Mojo calls a value's `__deinit__()` destructor when its lifetime ends (ASAP, last-use destruction)",
     title: 'Release the motor handle on teardown',
     topic: 'Value Lifecycle',
     priority: 'High',
@@ -1958,7 +1958,7 @@ def main():
       '(RAII), but right now no cleanup ever happens, so the release line is ' +
       'missing from the audit log. Add a destructor that prints the release; it ' +
       'runs automatically at end of scope.\n\n' +
-      'Example:\n```\ndef __del__(deinit self):\n    print("Closed connection", self.conn_id)\n```',
+      'Example:\n```\ndef __deinit__(deinit self):\n    print("Closed connection", self.conn_id)\n```',
     starter: `struct MotorHandle:
     var motor_id: Int
 
@@ -2317,62 +2317,62 @@ def main():
 
 
 def main():
-    comptime r = reflect[RobotConfig]()
-    print("RobotConfig fields:", r.num_fields())
+    comptime field_count = reflect[RobotConfig].num_fields()
+    print("RobotConfig fields:", field_count)
 `,
     validation: { kind: 'run', expectedStdout: 'RobotConfig fields: 3' },
     hint: 'The handle has no `num_fields` method — that is the wrong name. Open the linked reflection docs, find the accessor that returns how many fields the struct declares, and call it with parentheses.',
   },
   {
     id: 'MQ-901',
-    concept: "Use the free function `alloc[T](n)` to allocate uninitialized heap memory for `n` values",
+    concept: "Use the free function `alloc[T]({count = n}).unsafe_leak()` to allocate uninitialized heap memory for `n` values",
     title: 'Allocate the encoder-sample scratch buffer',
     topic: 'Pointers',
     priority: 'High',
     docUrl: `${DOCS}/pointers/unsafe-pointers/#allocating-memory`,
     file: 'src/scratch.mojo',
     description:
-      'An `UnsafePointer[T]` is a raw handle to heap memory; you reserve space ' +
-      'for `n` uninitialized values with the free function `alloc[T](n)`. The ' +
+      'A `Pointer[T]` is a raw handle to heap memory; you reserve space ' +
+      'for `n` uninitialized values with `alloc[T]({count = n}).unsafe_leak()`. The ' +
       'driver stages a single encoder reading in a one-slot heap buffer: ' +
       'allocate, initialize the pointee, read it back with `[]`, then destroy and ' +
       'free it. The allocation call uses an API that does not exist in this ' +
       'toolchain, so it will not compile. Use the free allocation function ' +
       'instead.\n\n' +
-      'Example: `p = alloc[SomeType](n)`',
+      'Example: `var p = alloc[SomeType]({count = n}).unsafe_leak()`',
     starter: `def main():
     # Stage a single encoder reading in a scratch buffer on the heap.
     # BUG: allocate, write the value, read it back, then release it.
-    ptr = UnsafePointer[Int].alloc(1)
+    var ptr = UnsafePointer[Int].alloc(1)
     ptr.unsafe_write(99)
-    value = ptr[]
+    var value = ptr[]
     print("Encoder count:", value)
-    ptr.destroy_pointee()
-    ptr.free()
+    ptr.unsafe_deinit_pointee()
+    ptr.unsafe_free()
 `,
     validation: { kind: 'run', expectedStdout: 'Encoder count: 99' },
-    hint: 'In this toolchain there is no `.alloc` method on `UnsafePointer`. Reach for the free allocation function that takes the element type as a parameter and the count as an argument; everything after it (initialize the pointee, dereference with `[]`, destroy, free) is already correct.',
+    hint: 'In this toolchain there is no `.alloc` method on `UnsafePointer`. Reach for the free allocation function that takes the element type as a parameter and a layout giving the count, then hand back the raw pointer with `.unsafe_leak()`; everything after it (initialize the pointee, dereference with `[]`, destroy, free) is already correct.',
   },
   {
     id: 'MQ-903',
-    concept: "With space for multiple values, `ptr[i]` accesses the element at offset `i`",
+    concept: "With space for multiple values, `ptr[unsafe_offset=i]` accesses the element at offset `i`",
     title: 'Read the right slot of the scratch buffer',
     topic: 'Pointers',
     priority: 'High',
     docUrl: `${DOCS}/pointers/unsafe-pointers/#storing-multiple-values`,
     file: 'src/ptr_index.mojo',
     description:
-      'When a pointer has space for multiple values, `ptr[i]` accesses the ' +
+      'When a pointer has space for multiple values, `ptr[unsafe_offset=i]` accesses ' +
       'element at offset `i`. This two-slot heap buffer stores 10 at index 0 and ' +
       '20 at index 1, then should print the second slot (20). But it reads index ' +
       '0, so it prints 10. Fix the index it dereferences.\n\n' +
-      'Example: `ptr[i]` reads the element at offset `i`.',
+      'Example: `ptr[unsafe_offset=i]` reads the element at offset `i`.',
     starter: `def main():
-    ptr = alloc[Int](2)
-    ptr[0] = 10
-    ptr[1] = 20
-    print("second:", ptr[0])
-    ptr.free()
+    var ptr = alloc[Int]({count = 2}).unsafe_leak()
+    ptr[unsafe_offset=0] = 10
+    ptr[unsafe_offset=1] = 20
+    print("second:", ptr[unsafe_offset=0])
+    ptr.unsafe_free()
 `,
     validation: { kind: 'run', expectedStdout: 'second: 20' },
     hint: 'The second slot lives at index 1, not 0 — dereference that index instead.',

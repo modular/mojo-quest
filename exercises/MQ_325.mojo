@@ -12,7 +12,7 @@
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Add the `ref` keyword before the loop variable to bind a reference and mutate the collection in place
 def main():
-    var readings = [1, 2, 3]
+    var readings: List[Int] = [1, 2, 3]
     for ref r in readings:
         r += 10
     print("first:", readings[0])

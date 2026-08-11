@@ -20,10 +20,10 @@ const CE_BASE = 'https://godbolt.org/api/compiler'
  * preview only; bump this constant (and update any affected exercises) as a
  * deliberate change when the docs move to a new stable release.
  */
-export const MOJO_COMPILER = 'mojo_1_0_0b1'
+export const MOJO_COMPILER = 'mojo_1_0_0'
 
 /** Human-friendly label for the pinned toolchain (shown in the editor). */
-export const MOJO_VERSION_LABEL = 'Mojo 1.0.0b1'
+export const MOJO_VERSION_LABEL = 'Mojo 1.0.0'
 
 export type RunResult = {
   /** Compilation exit code was 0. */

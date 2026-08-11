@@ -16,6 +16,6 @@ def load_map(var cells: List[Int]) -> Int:
 
 
 def main():
-    var cells = [16, 32, 64, 128]
+    var cells: List[Int] = [16, 32, 64, 128]
     var result = load_map(cells^)
     print("map cells loaded:", result)

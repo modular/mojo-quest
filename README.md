@@ -175,7 +175,7 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-704** — `@implicit` single-argument conversion constructors.
 - **MQ-705** — the `Copyable` trait and its compiler-synthesized `.copy()`.
 - **MQ-706** — the `ImplicitlyCopyable` trait.
-- **MQ-710** — the `__del__` destructor and ASAP last-use destruction.
+- **MQ-710** — the `__deinit__` destructor and ASAP last-use destruction.
 
 ### MQ-8xx — Metaprogramming
 
@@ -195,8 +195,9 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 
 ### MQ-9xx — Unsafe pointers & testing
 
-- **MQ-901** — allocating heap memory with the free function `alloc[T](n)`.
-- **MQ-903** — pointer offset indexing (`ptr[i]`).
+- **MQ-901** — allocating heap memory with the free function
+  `alloc[T]({count = n}).unsafe_leak()`.
+- **MQ-903** — pointer offset indexing (`ptr[unsafe_offset=i]`).
 - **MQ-950** — `assert_equal` from the `testing` module.
 - **MQ-951** — the `assert_raises` context manager.
 

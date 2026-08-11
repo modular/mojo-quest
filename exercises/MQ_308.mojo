@@ -16,5 +16,5 @@ def is_allowed(sensor_id: Int, allowed: List[Int]) -> Bool:
 
 
 def main():
-    var allowed = [2, 4, 6]
+    var allowed: List[Int] = [2, 4, 6]
     print("ok:", is_allowed(4, allowed))
