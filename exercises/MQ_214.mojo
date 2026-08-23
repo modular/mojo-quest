@@ -11,13 +11,11 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Math operations on SIMD values are applied elementwise, on each individual element in the vector
-def combine_counts(
-    a: SIMD[DType.int32, 4], b: SIMD[DType.int32, 4]
-) -> SIMD[DType.int32, 4]:
+def combine_counts(a: SIMD[.int32, 4], b: SIMD[.int32, 4]) -> SIMD[.int32, 4]:
     return a + b
 
 
 def main():
-    var imu_a = SIMD[DType.int32, 4](1, 2, 3, 4)
-    var imu_b = SIMD[DType.int32, 4](10, 20, 30, 40)
+    var imu_a = SIMD[.int32, 4](1, 2, 3, 4)
+    var imu_b = SIMD[.int32, 4](10, 20, 30, 40)
     print("Combined counts:", combine_counts(imu_a, imu_b))

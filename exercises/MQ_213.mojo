@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: A `SIMD` value is a fixed-size vector defined by two parameters: a `DType` and the number of elements
-comptime Velocity = SIMD[DType.float32, 4]
+comptime Velocity = SIMD[.float32, 4]
 
 
 def main():
