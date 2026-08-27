@@ -2348,7 +2348,7 @@ def main():
     var value = ptr[]
     print("Encoder count:", value)
     ptr.unsafe_deinit_pointee()
-    ptr.unsafe_free()
+    ptr.dealloc()
 `,
     validation: { kind: 'run', expectedStdout: 'Encoder count: 99' },
     hint: 'In this toolchain there is no `.alloc` method on `UnsafePointer`. Reach for the free allocation function that takes the element type as a parameter and a layout giving the count, then hand back the raw pointer with `.unsafe_leak()`; everything after it (initialize the pointee, dereference with `[]`, destroy, free) is already correct.',
@@ -2372,7 +2372,7 @@ def main():
     ptr[unsafe_offset=0] = 10
     ptr[unsafe_offset=1] = 20
     print("second:", ptr[unsafe_offset=0])
-    ptr.unsafe_free()
+    ptr.dealloc()
 `,
     validation: { kind: 'run', expectedStdout: 'second: 20' },
     hint: 'The second slot lives at index 1, not 0 — dereference that index instead.',

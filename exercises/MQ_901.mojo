@@ -18,4 +18,4 @@ def main():
     var value = ptr[]
     print("Encoder count:", value)
     ptr.unsafe_deinit_pointee()
-    ptr.unsafe_free()
+    ptr.dealloc()

@@ -16,4 +16,4 @@ def main():
     ptr[unsafe_offset=0] = 10
     ptr[unsafe_offset=1] = 20
     print("second:", ptr[unsafe_offset=1])
-    ptr.unsafe_free()
+    ptr.dealloc()
