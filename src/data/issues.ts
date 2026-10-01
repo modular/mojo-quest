@@ -548,7 +548,7 @@ def main():
     print("Velocity lane 0:", v[0])
 `,
     validation: { kind: 'run', expectedStdout: 'Velocity lane 0: 1.0' },
-    hint: 'The name `Velocity` is undefined until you create it. Bind it with `comptime` at file scope (above `main`) to that 4-lane float32 SIMD type so it is in scope when `main` constructs it. (Mojo’s older `alias` keyword still works but is deprecated in favour of `comptime`.)',
+    hint: 'The name `Velocity` is undefined until you create it. Bind it with `comptime` at file scope (above `main`) to that 4-lane float32 SIMD type so it is in scope when `main` constructs it.',
   },
   {
     id: 'MQ-214',
@@ -2325,33 +2325,35 @@ def main():
   },
   {
     id: 'MQ-901',
-    concept: "Use the free function `alloc[T]({count = n}).unsafe_leak()` to allocate uninitialized heap memory for `n` values",
+    concept: "Use the free function `unsafe_alloc[T](n)` to allocate space for `n` uninitialized values of `T`",
     title: 'Allocate the encoder-sample scratch buffer',
     topic: 'Pointers',
     priority: 'High',
     docUrl: `${DOCS}/pointers/unsafe-pointers/#allocating-memory`,
     file: 'src/scratch.mojo',
     description:
-      'A `Pointer[T]` is a raw handle to heap memory; you reserve space ' +
-      'for `n` uninitialized values with `alloc[T]({count = n}).unsafe_leak()`. The ' +
-      'driver stages a single encoder reading in a one-slot heap buffer: ' +
-      'allocate, initialize the pointee, read it back with `[]`, then destroy and ' +
-      'free it. The allocation call uses an API that does not exist in this ' +
-      'toolchain, so it will not compile. Use the free allocation function ' +
-      'instead.\n\n' +
-      'Example: `var p = alloc[SomeType]({count = n}).unsafe_leak()`',
-    starter: `def main():
-    # Stage a single encoder reading in a scratch buffer on the heap.
+      '`unsafe_alloc[T](n)` reserves space for `n` uninitialized values of ' +
+      '`T` and hands back a `Pointer` to it. The driver stages a single ' +
+      'encoder reading in a one-slot scratch buffer: allocate, initialize the ' +
+      'pointee, read it back with `[]`, then destroy it and free the storage. ' +
+      'The allocation call never says what it is allocating, so it will not ' +
+      'compile.\n\n' +
+      'Example: `var p = unsafe_alloc[SomeType](n)`',
+    starter: `from std.memory.alloc import unsafe_alloc
+
+
+def main():
+    # Stage a single encoder reading in a scratch buffer.
     # BUG: allocate, write the value, read it back, then release it.
-    var ptr = UnsafePointer[Int].alloc(1)
-    ptr.unsafe_write(99)
+    var ptr = unsafe_alloc(1)
+    ptr.unsafe_write(copy=99)
     var value = ptr[]
     print("Encoder count:", value)
     ptr.unsafe_deinit_pointee()
-    ptr.dealloc()
+    ptr.unsafe_free()
 `,
     validation: { kind: 'run', expectedStdout: 'Encoder count: 99' },
-    hint: 'In this toolchain there is no `.alloc` method on `UnsafePointer`. Reach for the free allocation function that takes the element type as a parameter and a layout giving the count, then hand back the raw pointer with `.unsafe_leak()`; everything after it (initialize the pointee, dereference with `[]`, destroy, free) is already correct.',
+    hint: 'You need to tell `unsafe_alloc` what type to allocate, so it can work out the size. Give it the element type as a parameter in brackets, before the count. Everything after the allocation is already correct.',
   },
   {
     id: 'MQ-903',
@@ -2372,7 +2374,7 @@ def main():
     ptr[unsafe_offset=0] = 10
     ptr[unsafe_offset=1] = 20
     print("second:", ptr[unsafe_offset=0])
-    ptr.dealloc()
+    ptr.unsafe_free()
 `,
     validation: { kind: 'run', expectedStdout: 'second: 20' },
     hint: 'The second slot lives at index 1, not 0 — dereference that index instead.',
