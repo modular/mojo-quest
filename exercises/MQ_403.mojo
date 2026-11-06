@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: To re-raise a caught error, use `raise` with the `^` sigil to transfer ownership of the error value
+# Mojo concept: Re-raise a caught error with `raise e`; adding the `^` sigil (`raise e^`) transfers it instead of copying it
 def attempt() raises:
     try:
         raise Error("sensor fault")

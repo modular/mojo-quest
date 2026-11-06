@@ -10,8 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: By the end of a constructor, all of the struct's fields must be initialized
-struct Waypoint(Copyable, Movable):
+# Mojo concept: By the end of an initializer, all of the struct's fields must be initialized
+struct Waypoint(Copyable):
     var x: Int
     var y: Int
 

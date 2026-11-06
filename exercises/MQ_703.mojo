@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Like any method, `__init__()` can be overloaded to construct the object from different arguments
-struct RobotConfig(Copyable, Movable):
+struct RobotConfig(Copyable):
     var name: String
     var max_rate: Int
 

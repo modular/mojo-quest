@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Mojo evaluates `a + b` by calling `a.__add__(b)`
-struct EnergyBudget(Copyable, Movable):
+struct EnergyBudget(Copyable):
     var millijoules: Int
 
     def __init__(out self, millijoules: Int):

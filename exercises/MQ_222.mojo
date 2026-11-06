@@ -10,10 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: `Dict` holds key-value pairs; specify the key type and value type as parameters
-from std.collections import Dict
-
-
+# Mojo concept: `Dict` holds key-value pairs; `d[key] = value` inserts an entry, and reading `d[key]` raises if the key is absent
 def main() raises:
     var joint_angles = Dict[String, Int]()
     joint_angles["joint_3"] = 128

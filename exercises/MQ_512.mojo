@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Implement `__eq__()` to support `==`; the `Equatable` trait provides `__eq__()` and `__ne__()`
-struct Version(Copyable, Movable):
+struct Version(Copyable):
     var major: Int
 
     def __init__(out self, major: Int):

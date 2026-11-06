@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: All struct fields are declared with `var` and a type annotation, and must be initialized in the constructor
-struct LidarScan(Copyable, Movable):
+struct LidarScan(Copyable):
     var near_points: Int
     var far_points: Int
 

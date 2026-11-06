@@ -10,9 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: The `@fieldwise_init` decorator generates a field-wise constructor, so you don't have to write `__init__` by hand
+# Mojo concept: The `@fieldwise_init` decorator generates a field-wise initializer, so you don't have to write `__init__` by hand
 @fieldwise_init
-struct LidarScan(Copyable, Movable):
+struct LidarScan(Copyable):
     var near_points: Int
     var far_points: Int
 

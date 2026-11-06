@@ -101,7 +101,7 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-109** — keyword-only arguments after a bare `*`.
 - **MQ-110** — variadic arguments (`*args`).
 - **MQ-111** — `pass` as a no-op placeholder for an empty block body.
-- **MQ-113** — function overloading by argument type.
+- **MQ-113** — function overloading by argument type or count.
 - **MQ-115** — propagating errors with the `raises` keyword.
 
 ### MQ-2xx — Variables, types & collections
@@ -112,13 +112,16 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-207** — transferring ownership with the `^` sigil.
 - **MQ-208** — binding a reference with `ref name`.
 - **MQ-210** — numeric operators don't auto-narrow or auto-widen.
-- **MQ-211** — converting operands to avoid integer truncation.
+- **MQ-211** — converting integer operands (e.g. `Float64(x)`) to avoid
+  integer truncation.
 - **MQ-213** — the `SIMD` type (a `DType` plus an element count).
 - **MQ-214** — elementwise math on SIMD values.
 - **MQ-215** — `String` operators and methods (e.g. `upper()`).
+- **MQ-219** — reading and replacing `List` elements with `list[i]`.
 - **MQ-220** — the `Tuple` collection (unpack or index).
 - **MQ-221** — the `List` collection (single element type).
-- **MQ-222** — the `Dict` key-value collection.
+- **MQ-222** — the `Dict` key-value collection (`d[key] = value`; reading a
+  missing key raises).
 - **MQ-223** — the `Set` collection of unique values.
 - **MQ-224** — `Optional` for maybe-present values.
 
@@ -141,21 +144,27 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 - **MQ-324** — `range(start, stop, step)`.
 - **MQ-325** — mutating a collection in place with a `ref` loop variable.
 - **MQ-326** — iterating any `collections` type with `for`.
+- **MQ-327** — the `match` statement: first matching `case` wins, `_` goes
+  last.
+- **MQ-328** — `if case .Some(name) = value:` to test and unwrap an
+  `Optional`.
 
 ### MQ-4xx — Errors & context managers
 
 - **MQ-401** — raising errors (`raises` + `raise Error("...")`).
 - **MQ-402** — handling errors with `try`/`except`.
-- **MQ-403** — re-raising with `raise` and the `^` sigil.
+- **MQ-403** — re-raising a caught error with `raise e` (or `raise e^`).
 - **MQ-412** — `with`-statement context managers and cleanup.
 
 ### MQ-5xx — Structs & modules
 
 - **MQ-501** — struct fields (`var` + type, initialized in the constructor).
-- **MQ-502** — instance methods and the implicit `self`.
+- **MQ-502** — instance methods and the `self` argument.
 - **MQ-503** — mutating the instance with `mut self`.
 - **MQ-504** — `@staticmethod` (no `self`).
+- **MQ-505** — `@fieldwise_init` generates the field-wise initializer.
 - **MQ-507** — move-only types (`Movable`, not `Copyable`).
+- **MQ-508** — immovable types with `not Movable`.
 - **MQ-510** — operator overloading via `__add__`.
 - **MQ-511** — unary operators (`__neg__`).
 - **MQ-512** — `__eq__` and the `Equatable` trait.
@@ -170,12 +179,13 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 
 ### MQ-7xx — Value lifecycle
 
-- **MQ-702** — all fields must be initialized by the end of the constructor.
+- **MQ-702** — all fields must be initialized by the end of the initializer.
 - **MQ-703** — overloading `__init__`.
-- **MQ-704** — `@implicit` single-argument conversion constructors.
-- **MQ-705** — the `Copyable` trait and its compiler-synthesized `.copy()`.
+- **MQ-704** — `@implicit` single-argument conversion initializers.
+- **MQ-705** — the `Copyable` trait, its `.copy()` method, and the synthesized
+  copy initializer.
 - **MQ-706** — the `ImplicitlyCopyable` trait.
-- **MQ-710** — the `__deinit__` destructor and ASAP last-use destruction.
+- **MQ-710** — the `__deinit__` deinitializer and ASAP last-use destruction.
 
 ### MQ-8xx — Metaprogramming
 
@@ -195,8 +205,8 @@ focused concept (the same `# Mojo concept:` line that heads its solution in
 
 ### MQ-9xx — Unsafe pointers & testing
 
-- **MQ-901** — allocating heap memory with the free function
-  `alloc[T]({count = n}).unsafe_leak()`.
+- **MQ-901** — allocating uninitialized heap memory with the module-level
+  function `unsafe_alloc[T](n)`.
 - **MQ-903** — pointer offset indexing (`ptr[unsafe_offset=i]`).
 - **MQ-950** — `assert_equal` from the `testing` module.
 - **MQ-951** — the `assert_raises` context manager.
@@ -210,8 +220,8 @@ Submissions are checked two ways, depending on the ticket:
   (indentation, type annotations, operator precedence, `mut self`, traits, …).
 - **`source`** — the program must compile and run cleanly, and the edited code
   must match a regex. Used for idioms that compile identically with or without
-  the fix, so output alone can't tell them apart: adding `var`, a docstring, or
-  the `^` transfer operator.
+  the fix, so output alone can't tell them apart: adding `var`, a docstring,
+  keyword arguments, or the `^` transfer sigil.
 
 The compiler/runner lives in [`src/lib/compile.ts`](src/lib/compile.ts) and the
 pass/fail logic in [`src/lib/validate.ts`](src/lib/validate.ts). The pinned
@@ -289,6 +299,7 @@ ship in the browser bundle.
 ```sh
 npm run verify:exercises                       # test against the pinned toolchain
 MOJO_COMPILER=mojo_nightly npm run verify:exercises   # preview an upcoming Mojo
+npm run verify:exercises -- --dump <dir>       # also save every build/run log
 ```
 
 For every issue, the runner
@@ -298,8 +309,14 @@ own `compileAndRun` + `checkSolution` to:
 1. compile + run the completed `exercises/<id>.mojo` and assert it satisfies the
    issue's `validation` (compiles, exits 0, output matches `expectedStdout` /
    source patterns), and
-2. compile + run the `starter` and assert it still **fails** (the puzzle is
+2. on the pinned toolchain, assert the solution compiles with no warnings (a
+   deprecation today is a removal in the next release), and
+3. compile + run the `starter` and assert it still **fails** (the puzzle is
    broken).
+
+`--dump <dir>` writes each starter's and solution's compiler and program output
+to `<dir>`. Diff two toolchains' dumps to confirm every starter still fails for
+the bug its ticket teaches, not because of an unrelated API change.
 
 It exits non-zero if anything fails, so it works in CI. Run it after bumping
 `MOJO_COMPILER` in [`src/lib/compile.ts`](src/lib/compile.ts). Requires outbound

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: An instance method takes `self` as an explicit first argument, letting it act on a particular instance of the struct
+# Mojo concept: An instance method receives the struct instance through its first argument, `self`, which is how it accesses that instance's fields
 struct Battery:
     var charge: Int
 

@@ -30,7 +30,8 @@ const DOCS = 'https://mojolang.org/docs/manual'
  *                (used for idioms that compile identically either way).
  *
  * Every starter and solution is verified against the live Mojo toolchain
- * (mojo_1_0_0) via `npm run verify:exercises`.
+ * (the pinned `MOJO_COMPILER` in src/lib/compile.ts) via
+ * `npm run verify:exercises`.
  */
 export const issues: Issue[] = [
   {
@@ -61,12 +62,12 @@ export const issues: Issue[] = [
     title: 'Get the navigation stack booting',
     topic: 'Language Basics',
     priority: 'High',
-    docUrl: `${DOCS}/functions/#anatomy-of-a-function`,
+    docUrl: `${DOCS}/basics/#blocks-and-statements`,
     file: 'src/nav.mojo',
     description:
       'A Mojo program runs from `main`. The boot message is sitting at column 0, ' +
       'so it is not part of `main`\'s body — the file will not even compile. Mojo ' +
-      'uses 4-space indentation for code blocks. Indent it.\n\n' +
+      'uses indentation (4 spaces by convention) to mark code blocks. Indent it.\n\n' +
       'Example:\n```\ndef main():\n    print("some message")\n```',
     starter: `def main():
 print("MQ Robotics nav stack online")
@@ -111,7 +112,7 @@ def main():
       'declares what kind of value a name holds, written `name: Type`; for a ' +
       'function you annotate each argument and put the return type after `->`. ' +
       'Annotate both arguments as `Int` and add the `Int` return type.\n\n' +
-      'Example: `def someFunction(a: Int, b: Int) -> Int:`',
+      'Example: `def some_function(a: Int, b: Int) -> Int:`',
     starter: `def grid_cells(rows, cols):
     return rows * cols
 
@@ -137,7 +138,7 @@ def main():
       '`grow_capacity` should return twice its input, but right now ' +
       'it returns the value unchanged. Fix the body so `grow_capacity(21)` is ' +
       '`42`.\n\n' +
-      'Example:\n```\ndef someFunction(x: Int) -> Int:\n    return x + 1\n```',
+      'Example:\n```\ndef some_function(x: Int) -> Int:\n    return x + 1\n```',
     starter: `# Ring-buffer helpers for the sensor ingest loop
 
 def grow_capacity(n: Int) -> Int:
@@ -156,7 +157,7 @@ def main():
     title: 'Document the command logger',
     topic: 'Functions',
     priority: 'Medium',
-    docUrl: `${DOCS}/functions/`,
+    docUrl: `${DOCS}/basics/#code-comments`,
     file: 'src/logging.mojo',
     description:
       '`log_command` has no documentation. A docstring is a string literal in ' +
@@ -200,7 +201,11 @@ def main():
 def main():
     set_limits(5, 2)
 `,
-    validation: { kind: 'run', expectedStdout: 'speed: 2 accel: 5' },
+    validation: {
+      kind: 'source',
+      patterns: ['set_limits\\([^)]*\\bmax_speed\\s*=\\s*2\\b', 'set_limits\\([^)]*\\bmax_accel\\s*=\\s*5\\b'],
+      message: 'Pass both limits by keyword: `max_speed=2` and `max_accel=5`.',
+    },
     hint: 'Name each argument at the call site (the `name=value` form) so each value lands in the argument you intend, regardless of order.',
   },
   {
@@ -309,7 +314,7 @@ def main():
   },
   {
     id: 'MQ-113',
-    concept: "Implement separate versions of a function with different argument types to \"overload\" it",
+    concept: "Implement separate versions of a function with different argument types or counts to \"overload\" it",
     title: 'Overload the footprint helper',
     topic: 'Functions',
     priority: 'Medium',
@@ -364,18 +369,17 @@ def main():
     title: 'Declare the odometry tick counter with `var`',
     topic: 'Variables',
     priority: 'High',
-    docUrl: `${DOCS}/variables/#explicitly-declared-variables`,
+    docUrl: `${DOCS}/variables/#variable-declarations`,
     dayDocUrls: [
       { label: 'Variables', url: `${DOCS}/variables/` },
       { label: 'Types', url: `${DOCS}/types/` },
     ],
     file: 'src/odometry.mojo',
     description:
-      'Our style guide requires explicit variable declarations. An ' +
-      'explicitly-declared variable is introduced with the `var` keyword. The ' +
-      'odometry tick counter is assigned without being declared. Declare it with ' +
-      '`var`.\n\n' +
-      'Example: `var someName = 0`',
+      'Mojo requires every new variable to be declared explicitly with the ' +
+      '`var` keyword. The odometry tick counter is assigned without being ' +
+      'declared, so the build fails. Declare it with `var`.\n\n' +
+      'Example: `var some_name = 0`',
     starter: `def main():
     tick_count = 0
     tick_count += 1
@@ -394,7 +398,7 @@ def main():
     title: 'Annotate a late-initialized variable',
     topic: 'Variables',
     priority: 'High',
-    docUrl: `${DOCS}/variables/#explicitly-declared-variables`,
+    docUrl: `${DOCS}/variables/#variable-declarations`,
     file: 'src/threshold.mojo',
     description:
       'This variable is declared on one line and assigned on the next — late ' +
@@ -417,7 +421,7 @@ def main():
     title: 'Fix the sensor-count type mismatch',
     topic: 'Variables',
     priority: 'Medium',
-    docUrl: `${DOCS}/variables/#type-annotations`,
+    docUrl: `${DOCS}/variables/#variable-declarations`,
     file: 'src/cast.mojo',
     description:
       'Mojo variables are strongly typed — a variable holds only values of its ' +
@@ -442,10 +446,10 @@ def main():
     title: 'Keep the original after handing one off',
     topic: 'Value Semantics',
     priority: 'Low',
-    docUrl: `${DOCS}/variables/#variable-semantics`,
+    docUrl: `${DOCS}/variables/#copying-and-moving-values`,
     file: 'src/copy_move.mojo',
     description:
-      'The starter transfers `a` into `b` with the `^` move operator, which ' +
+      'The starter transfers `a` into `b` with the `^` transfer sigil, which ' +
       'consumes `a` — so the later `a.append(4)` uses a value that no longer ' +
       'exists and the build fails. We need both lists, so make an explicit copy ' +
       'instead of moving.\n\n' +
@@ -465,7 +469,7 @@ def main():
     title: 'Bind a mutable reference into the buffer',
     topic: 'Value Semantics',
     priority: 'Low',
-    docUrl: `${DOCS}/values/lifetimes/`,
+    docUrl: `${DOCS}/variables/#reference-bindings`,
     file: 'src/ref_bind.mojo',
     description:
       'Writing through `first` should change the first reading in place, but ' +
@@ -508,17 +512,19 @@ def main():
   },
   {
     id: 'MQ-211',
-    concept: "Convert the operands to the target type's constructor before dividing to avoid integer truncation",
+    concept: "Convert integer operands with the target type's constructor (e.g. `Float64(x)`) before dividing to avoid integer truncation",
     title: 'Stop truncating the average loop latency',
     topic: 'Types',
     priority: 'High',
     docUrl: `${DOCS}/types/#numeric-type-conversion`,
     file: 'src/latency.mojo',
     description:
-      'Average control-loop latency should be `3.5`, but dividing two `Int`s does ' +
-      'integer division and discards the fraction before the result becomes a ' +
-      '`Float64`. Convert the operands to floating point before dividing.\n\n' +
-      'Example: `Float64(someInt) / Float64(otherInt)`',
+      'Average control-loop latency should be `3.5`, but `total_ms / num_loops` ' +
+      'divides two `Int`s. Integer division produces an `Int` (7 / 2 is 3, the ' +
+      'fraction is lost), and Mojo won\'t implicitly turn that `Int` into the ' +
+      '`Float64` the function returns, so the build fails. Convert the operands ' +
+      'to floating point before dividing.\n\n' +
+      'Example: `Float64(some_int) / Float64(other_int)`',
     starter: `def avg_latency(total_ms: Int, num_loops: Int) -> Float64:
     return total_ms / num_loops
 
@@ -527,7 +533,7 @@ def main():
     print("avg latency:", avg_latency(7, 2))
 `,
     validation: { kind: 'run', expectedStdout: 'avg latency: 3.5' },
-    hint: 'Dividing two whole numbers happens in integer space and drops the remainder before the value is ever widened to a float, so 7 over 2 loses its .5. Convert each operand to a floating-point type first, then divide.',
+    hint: 'Dividing two `Int`s yields an `Int` with the remainder dropped, and Mojo won\'t silently widen it to `Float64`. Convert each operand to `Float64` first, then divide.',
   },
   {
     id: 'MQ-213',
@@ -564,7 +570,7 @@ def main():
       'per-axis totals, but right now it returns only the first IMU. SIMD ' +
       'addition is lane-wise, so adding the two vectors gives `[11, 22, 33, 44]`. ' +
       'Return the sum of the two IMUs.\n\n' +
-      'Example: `var result = someVector + anotherVector`',
+      'Example: `var result = some_vector + anotherVector`',
     starter: `def combine_counts(
     a: SIMD[DType.int32, 4], b: SIMD[DType.int32, 4]
 ) -> SIMD[DType.int32, 4]:
@@ -585,16 +591,16 @@ def main():
     title: 'Emit device tags in uppercase',
     topic: 'Strings',
     priority: 'High',
-    docUrl: 'https://mojolang.org/docs/std/builtin/string_literal/StringLiteral/#upper',
+    docUrl: 'https://mojolang.org/docs/std/collections/string/string/String/#upper',
     file: 'src/device_tag.mojo',
     description:
       'The fleet registry only accepts uppercase device tags, but `device_tag` ' +
       'returns the joined string as-is, so it emits `mq-amr`. A `String` is ' +
       'Mojo’s text type, and it offers operators that combine strings (`"str" + "str"`) ' +
-      'and transformational methods (`"str".someTransformMethod()`) that return a ' +
+      'and transformational methods (`"str".some_transform_method()`) that return a ' +
       'transformed copy rather than changing the original. Call the String ' +
       'method that returns an upper-cased copy on the finished tag.\n\n' +
-      'Example: `someString.someTransformMethod()` applied to the whole joined result.',
+      'Example: `some_string.some_transform_method()` applied to the whole joined result.',
     starter: `def device_tag(family: String, model: String) -> String:
     return family + "-" + model
 
@@ -642,10 +648,10 @@ def main():
     docUrl: `${DOCS}/types/#tuples`,
     file: 'src/telemetry.mojo',
     description:
-      'The telemetry panel reads a `(scans, points)` tuple, but it unpacks the two ' +
-      'slots in the wrong order, so the labels are swapped. A tuple keeps elements ' +
+      'The telemetry panel reads a `(scans, points)` tuple, but it reads the two ' +
+      'slots by index in the wrong order, so the labels are swapped. A tuple keeps elements ' +
       'in the order they were packed — line up each index with its position.\n\n' +
-      'Example: read `someTuple[0]` and `someTuple[1]` to match how the pair was built.',
+      'Example: read `some_tuple[0]` and `some_tuple[1]` to match how the pair was built.',
     starter: `def scan_stats() -> Tuple[Int, Int]:
     var num_scans = 4
     var total_points = 512
@@ -676,7 +682,7 @@ def main():
       'untyped `List()`, so Mojo cannot infer its element type and the build ' +
       "fails. We're storing waypoint ids as `Int`s — annotate the element " +
       'type.\n\n' +
-      'Example: `var someList = List[SomeType]()`',
+      'Example: `var some_list = List[SomeType]()`',
     starter: `def main():
     var waypoints = List()
     waypoints.append(128)
@@ -688,7 +694,7 @@ def main():
   },
   {
     id: 'MQ-222',
-    concept: "`Dict` holds key-value pairs; specify the key type and value type as parameters",
+    concept: "`Dict` holds key-value pairs; `d[key] = value` inserts an entry, and reading `d[key]` raises if the key is absent",
     title: 'Compile the joint-angle lookup',
     topic: 'Collections',
     priority: 'High',
@@ -706,11 +712,8 @@ def main():
       'absent, so a key lookup is a raising call; `main` performs one ' +
       '(`joint_angles["joint_3"]`) but does not declare that it can raise, so it ' +
       'will not compile. Record the second joint and mark `main` as raising.\n\n' +
-      'Example: `def someFunction() raises:`',
-    starter: `from std.collections import Dict
-
-
-def main():
+      'Example: `def some_function() raises:`',
+    starter: `def main():
     var joint_angles = Dict[String, Int]()
     joint_angles["joint_3"] = 128
     # TODO: also record joint_8 at an angle of 256
@@ -758,9 +761,8 @@ def main():
     description:
       '`cache_lookup` returns a value on a hit and `None` on a miss, but its ' +
       'return type is `Int` — which cannot hold `None`. Fix it so the function ' +
-      'can return either. You will need to import `Optional` from ' +
-      '`std.collections` and update the return type.\n\n' +
-      'Example:\n```\nfrom std.collections import Optional\n\ndef find(x: Int) -> Optional[Int]:\n    if x > 0:\n        return x\n    return None\n```',
+      'can return either by changing the return type to `Optional[Int]`.\n\n' +
+      'Example:\n```\ndef find(x: Int) -> Optional[Int]:\n    if x > 0:\n        return x\n    return None\n```',
     starter: `def cache_lookup(sensor_id: Int) -> Int:
     if sensor_id == 7:
         return 512
@@ -780,7 +782,7 @@ def main() raises:
         print('miss:', miss)
 `,
     validation: { kind: 'run', expectedStdout: 'hit: 512\nmiss: None' },
-    hint: 'The return type `Int` cannot represent “no value”. Import the right type from `std.collections` and use it as a wrapper around `Int` in the return annotation — that tells Mojo the function may return nothing.',
+    hint: 'The return type `Int` cannot represent “no value”. Wrap it in `Optional[...]` in the return annotation; `Optional` is always available, no import needed.',
   },
   {
     id: 'MQ-301',
@@ -788,7 +790,7 @@ def main() raises:
     title: 'Square the value with exponentiation',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#arithmetic-operators`,
+    docUrl: `${DOCS}/operators/#exponentiation`,
     dayDocUrls: [
       { label: 'Operators', url: `${DOCS}/operators/` },
       { label: 'Control flow', url: `${DOCS}/control-flow/` },
@@ -816,7 +818,7 @@ def main():
     title: 'Split readings into full bins',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#arithmetic-operators`,
+    docUrl: `${DOCS}/operators/#division-and-remainder`,
     file: 'src/divmod.mojo',
     description:
       '`split_into_bins` should report how many full bins of 5 fit into 17 ' +
@@ -844,7 +846,7 @@ def main():
     title: 'Flag a low battery at the threshold',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#comparison-operators`,
+    docUrl: `${DOCS}/operators/#comparisons`,
     file: 'src/compare.mojo',
     description:
       'Mojo’s comparison operators — `==`, `!=`, `<`, `<=`, `>`, and `>=` — test ' +
@@ -868,7 +870,7 @@ def main():
     title: 'Bound-check with a chained comparison',
     topic: 'Operators',
     priority: 'Low',
-    docUrl: `${DOCS}/operators/#comparison-operators`,
+    docUrl: `${DOCS}/operators/#chained-comparisons`,
     file: 'src/chained.mojo',
     description:
       '`in_range` should reject a temperature outside the safe band of 0–85, but ' +
@@ -893,7 +895,7 @@ def main():
     title: 'Combine status flags with bitwise OR',
     topic: 'Operators',
     priority: 'Low',
-    docUrl: `${DOCS}/operators/#bitwise-operators`,
+    docUrl: `${DOCS}/operators/#bitwise-operations`,
     file: 'src/flags.mojo',
     description:
       '`status_word` should carry both the READY and ARMED bits, but it ANDs the ' +
@@ -920,7 +922,7 @@ def main():
     title: 'Require both preconditions',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#boolean-operators`,
+    docUrl: `${DOCS}/operators/#short-circuit-evaluation`,
     file: 'src/preconditions.mojo',
     description:
       'The robot may only drive when it has a position fix AND is calibrated, but ' +
@@ -945,7 +947,7 @@ def main():
     title: 'Check membership in the allow-list',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#membership-operators`,
+    docUrl: `${DOCS}/operators/#in-and-not-in`,
     file: 'src/membership.mojo',
     description:
       '`is_allowed` should report whether a sensor id is in the allow-list, but it ' +
@@ -970,7 +972,7 @@ def main():
     title: 'Pick a label with a conditional expression',
     topic: 'Operators',
     priority: 'Medium',
-    docUrl: `${DOCS}/operators/#conditional-expressions`,
+    docUrl: `${DOCS}/operators/#conditional-expression`,
     file: 'src/ternary.mojo',
     description:
       '`speed_label` chooses its label with C-style ternary syntax ' +
@@ -1049,7 +1051,7 @@ def main():
       'core, but the comparison is backwards: a queue of 250 is sent to the fast ' +
       'core and a shallow queue of 40 to overflow. Fix the relational ' +
       'operator.\n\n' +
-      'Example: `if someValue > limit:`',
+      'Example: `if some_value > limit:`',
     starter: `def route_task(queue_depth: Int) -> String:
     if queue_depth < 100:
         return "overflow-core"
@@ -1078,7 +1080,7 @@ def main():
       'through 5 (a linear back-off), but `attempt` is never advanced, so it loops ' +
       'forever and times out. Add the increment as the last line of the loop ' +
       'body.\n\n' +
-      'Example: `someCounter += 1`',
+      'Example: `some_counter += 1`',
     starter: `def main():
     var attempt = 1
     var total = 0
@@ -1102,7 +1104,7 @@ def main():
       'Every third slot is reserved for the control loop and should be skipped, so ' +
       'the work total comes out to 27. The `if` body is empty — add the statement ' +
       'that jumps to the next loop iteration.\n\n' +
-      'Example (a *different* loop-control keyword — check the docs for the one you need):\n```\nfor i in range(count):\n    if someCondition:\n        break\n```',
+      'Example (a *different* loop-control keyword — check the docs for the one you need):\n```\nfor i in range(count):\n    if some_condition:\n        break\n```',
     starter: `def main():
     var total = 0
     for i in range(1, 10):
@@ -1151,7 +1153,7 @@ def main():
     title: 'Step through every other slot',
     topic: 'Control Flow',
     priority: 'Medium',
-    docUrl: `${DOCS}/control-flow/#iterating-over-a-range`,
+    docUrl: `${DOCS}/control-flow/#iterating-ranges`,
     file: 'src/range_step.mojo',
     description:
       'A `range(start, stop, step)` produces the integers from `start` up to (but ' +
@@ -1175,13 +1177,13 @@ def main():
     title: 'Mutate readings in place while iterating',
     topic: 'Control Flow',
     priority: 'Medium',
-    docUrl: `${DOCS}/control-flow/#iterating-by-reference`,
+    docUrl: `${DOCS}/control-flow/#iterating-using-references`,
     file: 'src/iter_ref.mojo',
     description:
       'Each reading should be bumped by 10 in place, but a plain `for r in ' +
-      'readings` binds a copy of each element, so the list is never changed and ' +
-      'the first value stays 1. Putting `ref` before the loop variable binds each ' +
-      'element by reference rather than copying it, so writes land in the list. ' +
+      'readings` binds each element as an immutable reference, so `r += 10` does ' +
+      'not compile. Putting `ref` before the loop variable binds a mutable ' +
+      'reference to each element, so writes land in the list. ' +
       'Iterate by reference with `ref`.\n\n' +
       'Example: `for ref item in container:`',
     starter: `def main():
@@ -1191,7 +1193,7 @@ def main():
     print("first:", readings[0])
 `,
     validation: { kind: 'run', expectedStdout: 'first: 11' },
-    hint: 'Add `ref` to the loop binding so each element is aliased in place; then the `+= 10` writes back to the list instead of to a copy.',
+    hint: 'Add `ref` to the loop binding so each element is aliased in place; then the `+= 10` writes back to the list.',
   },
   {
     id: 'MQ-326',
@@ -1223,6 +1225,72 @@ def main():
     hint: 'The loop visits every return, but each pass throws away what came before and keeps only the current value — that is why you see the final element instead of the sum. The accumulator should grow with each item.',
   },
   {
+    id: 'MQ-327',
+    concept: "A `match` statement runs the first `case` whose pattern matches, so the `_` catch-all goes last",
+    title: 'Decode the drive-mode codes',
+    topic: 'Control Flow',
+    priority: 'High',
+    docUrl: `${DOCS}/control-flow/#the-match-statement`,
+    file: 'src/drive_mode.mojo',
+    description:
+      '`mode_name` decodes a drive-mode code with a `match` statement, but ' +
+      'every code comes out as `unknown`. A `match` compares one value against ' +
+      'its `case` patterns in order and runs only the first one that matches. A ' +
+      'literal such as `0` matches an equal value, `|` joins alternatives ' +
+      '(`1 | 2`), and `_` matches anything. Here the `_` case is listed first, ' +
+      'so it wins every time and the compiler warns that the other cases are ' +
+      'unreachable. Reorder the cases so each code reaches its own branch.\n\n' +
+      'Example:\n```\nmatch value:\n    case 0:\n        ...\n    case _:\n        ...\n```',
+    starter: `def mode_name(code: Int) -> String:
+    match code:
+        case _:
+            return "unknown"
+        case 0:
+            return "idle"
+        case 1 | 2:
+            return "driving"
+        case 3:
+            return "docking"
+
+
+def main():
+    for code in [0, 2, 3, 7]:
+        print(code, "->", mode_name(code))
+`,
+    validation: { kind: 'run', expectedStdout: '0 -> idle\n2 -> driving\n3 -> docking\n7 -> unknown' },
+    hint: 'Cases are tested top to bottom, and `_` matches every value. Move the catch-all `case _:` to the end so the specific codes get a chance to match first.',
+  },
+  {
+    id: 'MQ-328',
+    concept: "`if case .Some(name) = value:` tests an `Optional` for a value and binds it in one step",
+    title: 'Report the battery charge when there is one',
+    topic: 'Control Flow',
+    priority: 'Medium',
+    docUrl: `${DOCS}/control-flow/#matching-optional-values`,
+    file: 'src/battery_report.mojo',
+    description:
+      '`describe` gets an `Optional[Int]` battery reading. When a reading is ' +
+      'present it should print the charge, but it refers to `level`, a name ' +
+      'that was never bound, so the build fails. An `Optional` holds either ' +
+      '`.Some(value)` or `.None`, and a pattern can match the `.Some` case and ' +
+      'bind the value inside it. `if case pattern = value:` tests one pattern ' +
+      'without a full `match`, and the names it binds are available in the ' +
+      '`if` block. Test the reading with `if case` and bind `level`.\n\n' +
+      'Example: `if case .Some(temp) = reading:`',
+    starter: `def describe(reading: Optional[Int]) -> String:
+    if reading:
+        return "charge: " + String(level) + "%"
+    return "no reading"
+
+
+def main():
+    print(describe(87))
+    print(describe(None))
+`,
+    validation: { kind: 'run', expectedStdout: 'charge: 87%\nno reading' },
+    hint: 'Replace the plain `if reading:` test with `if case .Some(level) = reading:`. The pattern only matches when a value is present, and it binds that value to `level` for the body.',
+  },
+  {
     id: 'MQ-401',
     concept: "By declaring `raises`, you tell Mojo a function may raise an error; raise one with `raise Error(\"...\")`",
     title: 'Reject invalid velocity commands with an error',
@@ -1238,7 +1306,7 @@ def main():
       'signature. Make three fixes: raise an `Error` in the `if n <= 0` branch, ' +
       'declare `validate_velocity` as `raises`, and declare `main` as `raises` so ' +
       'it can propagate the error.\n\n' +
-      'Example: `def someFunction(x: Int) raises -> Int:` with `raise Error("...")` in its body.',
+      'Example: `def some_function(x: Int) raises -> Int:` with `raise Error("...")` in its body.',
     starter: `def validate_velocity(n: Int) -> Int:
     if n <= 0:
         pass  # TODO: reject the invalid velocity by raising an Error
@@ -1270,10 +1338,10 @@ def main():
     docUrl: `${DOCS}/errors/#handle-an-error`,
     file: 'src/catch_fallback.mojo',
     description:
-      '`checked` raises on a negative reading. `main` calls it with `-1`, so the ' +
-      'program aborts instead of degrading gracefully. A `try`/`except` block ' +
-      'runs risky code in the `try`, and if it raises, control jumps to the ' +
-      '`except` block instead of aborting. Wrap the call in a `try`/`except` and ' +
+      '`checked` raises on a negative reading. `main` calls it with `-1`, but ' +
+      '`main` neither handles the error nor is declared `raises`, so the program ' +
+      'won\'t compile. A `try`/`except` block runs risky code in the `try`, and ' +
+      'if it raises, control jumps to the `except` block. Wrap the call in a `try`/`except` and ' +
       'print `value: 0` on failure.\n\n' +
       'Example:\n```\ntry:\n    risky()\nexcept:\n    handle()\n```',
     starter: `def checked(n: Int) raises -> Int:
@@ -1290,7 +1358,7 @@ def main():
   },
   {
     id: 'MQ-403',
-    concept: "To re-raise a caught error, use `raise` with the `^` sigil to transfer ownership of the error value",
+    concept: "Re-raise a caught error with `raise e`; adding the `^` sigil (`raise e^`) transfers it instead of copying it",
     title: 'Log and re-raise the fault',
     topic: 'Error Handling',
     priority: 'Medium',
@@ -1299,9 +1367,10 @@ def main():
     description:
       '`attempt` should log a fault and then re-raise it so the caller can ' +
       'recover, but its `except e` block swallows the error, so `main` never ' +
-      'reaches its recovery path and "recovered" is missing. Re-raise after ' +
-      'logging by transferring ownership of the caught error with the `^` sigil.' +
-      '\n\nExample: `raise e^` inside `except e` re-throws the caught error.',
+      'reaches its recovery path and "recovered" is missing. Re-raise the caught ' +
+      'error after logging it. Adding the `^` transfer sigil (`raise e^`) moves ' +
+      'the error out instead of copying it.\n\n' +
+      'Example: `raise e` (or `raise e^`) inside `except e` re-throws the caught error.',
     starter: `def attempt() raises:
     try:
         raise Error("sensor fault")
@@ -1317,10 +1386,10 @@ def main():
 `,
     validation: {
       kind: 'source',
-      patterns: ['raise\\s+e\\s*\\^'],
-      message: 'Re-raise the caught error by transferring it with the `^` sigil: `raise e^`.',
+      patterns: ['raise\\s+e\\b'],
+      message: 'Re-raise the caught error with `raise e` (or `raise e^`).',
     },
-    hint: 'Re-raise the same error you caught: add `raise e^` as the last line of the `except e` block. The `^` transfers ownership of the caught error `e` back out.',
+    hint: 'Re-raise the same error you caught: add `raise e` (or `raise e^`, which transfers it without a copy) as the last line of the `except e` block.',
   },
   {
     id: 'MQ-412',
@@ -1365,9 +1434,9 @@ def main():
       'and initialized in the constructor. `LidarScan` is missing its ' +
       '`far_points` field, so `total()` and the constructor will not compile. ' +
       'Declare the `far_points` field (an `Int`) and assign it in `__init__`.\n\n' +
-      'Example field: `var someField: SomeType`\n' +
-      'Example assignment: `self.someField = someField`',
-    starter: `struct LidarScan(Copyable, Movable):
+      'Example field: `var some_field: SomeType`\n' +
+      'Example assignment: `self.some_field = some_field`',
+    starter: `struct LidarScan(Copyable):
     var near_points: Int
 
     def __init__(out self, near_points: Int, far_points: Int):
@@ -1386,7 +1455,7 @@ def main():
   },
   {
     id: 'MQ-502',
-    concept: "An instance method takes `self` as an explicit first argument, letting it act on a particular instance of the struct",
+    concept: "An instance method receives the struct instance through its first argument, `self`, which is how it accesses that instance's fields",
     title: 'Add the low-battery method',
     topic: 'Structs',
     priority: 'High',
@@ -1394,8 +1463,8 @@ def main():
     file: 'src/battery.mojo',
     description:
       '`Battery` stores a charge level but has no `is_low` method, yet `main` ' +
-      'calls `b.is_low()`. An instance method takes `self` as an explicit first ' +
-      'argument, which is how it gets access to that instance’s fields. Add a ' +
+      'calls `b.is_low()`. An instance method receives the instance through its ' +
+      'first argument, `self`, which is how it gets access to that instance’s fields. Add a ' +
       'method `is_low(self) -> Bool` that returns whether the charge is below 20.\n\n' +
       'Example:\n```\ndef some_method(self) -> Bool:\n    return self.field < limit\n```',
     starter: `struct Battery:
@@ -1425,8 +1494,8 @@ def main():
       'compiler rejects the in-place update. A method that modifies its own ' +
       'fields needs a mutable receiver, declared `mut self`. Fix the ' +
       'signature.\n\n' +
-      'Example: `def someMethod(mut self):`',
-    starter: `struct FrameCounter(Copyable, Movable):
+      'Example: `def some_method(mut self):`',
+    starter: `struct FrameCounter(Copyable):
     var count: Int
 
     def __init__(out self, count: Int):
@@ -1460,7 +1529,8 @@ def main():
       '`ticks_per_rev` does not use any instance data, and `main` calls it on the ' +
       'type itself (`Encoder.ticks_per_rev()`). A `@staticmethod` belongs to the ' +
       'type rather than an instance: it takes no `self` and so cannot read ' +
-      'fields. Without that decorator the type-level call will not compile. Mark ' +
+      'fields. Without that decorator Mojo treats `ticks_per_rev` as an instance ' +
+      'method and rejects it because it has no `self` argument. Mark ' +
       'it static.\n\n' +
       'Example:\n```\n@staticmethod\ndef some_method() -> Int:\n    ...\n```',
     starter: `struct Encoder:
@@ -1476,7 +1546,7 @@ def main():
   },
   {
     id: 'MQ-505',
-    concept: "The `@fieldwise_init` decorator generates a field-wise constructor, so you don't have to write `__init__` by hand",
+    concept: "The `@fieldwise_init` decorator generates a field-wise initializer, so you don't have to write `__init__` by hand",
     title: 'Synthesize the LidarScan constructor',
     topic: 'Structs',
     priority: 'Medium',
@@ -1490,7 +1560,7 @@ def main():
       'so `LidarScan(8, 256)` will not compile. Add the decorator so the ' +
       'field-wise constructor is synthesized.\n\n' +
       'Example:\n```\n@fieldwise_init\nstruct SomeType:\n    var field: Int\n```',
-    starter: `struct LidarScan(Copyable, Movable):
+    starter: `struct LidarScan(Copyable):
     var near_points: Int
     var far_points: Int
 
@@ -1538,6 +1608,39 @@ def main():
     hint: 'A move-only value can’t be copied into the call — hand it over with the `^` transfer operator on the argument.',
   },
   {
+    id: 'MQ-508',
+    concept: "Write `not Movable` in a struct's conformance list to opt out of `Movable`, making the type immovable",
+    title: 'Pin the port lock in place',
+    topic: 'Structs',
+    priority: 'Low',
+    docUrl: `${DOCS}/lifecycle/life/#move-only-and-immovable-types`,
+    file: 'src/port_lock.mojo',
+    description:
+      'A `PortLock` guards a hardware port and must stay at the address where ' +
+      'it was created, so it must never be moved. Structs are movable by ' +
+      'default. To opt out of a trait, write `not` and the trait name in the ' +
+      'conformance list; the compiler then rejects any attempt to transfer the ' +
+      'value with `^`. Declare `PortLock` as not `Movable`.\n\n' +
+      'Example: `struct Handle(not Movable):`',
+    starter: `struct PortLock:
+    var port: Int
+
+    def __init__(out self, port: Int):
+        self.port = port
+
+
+def main():
+    var lock = PortLock(4)
+    print("locked port:", lock.port)
+`,
+    validation: {
+      kind: 'source',
+      patterns: ['struct\\s+PortLock\\s*\\([^)]*\\bnot\\s+Movable\\b'],
+      message: 'Opt `PortLock` out of `Movable` in its conformance list.',
+    },
+    hint: 'Give `PortLock` a conformance list in parentheses after its name, and put `not Movable` in it.',
+  },
+  {
     id: 'MQ-510',
     concept: "Mojo evaluates `a + b` by calling `a.__add__(b)`",
     title: 'Combine two energy budgets with `+`',
@@ -1552,7 +1655,7 @@ def main():
       'Mojo turns `a + b` into `a.__add__(b)`, so overload `+` by defining ' +
       '`__add__`, folding both operands into the returned value.\n\n' +
       'Example: `def __add__(self, other: Self) -> Self: return Self(self.field + other.field)`',
-    starter: `struct EnergyBudget(Copyable, Movable):
+    starter: `struct EnergyBudget(Copyable):
     var millijoules: Int
 
     def __init__(out self, millijoules: Int):
@@ -1574,7 +1677,7 @@ def main():
     title: 'Negate an offset with a unary operator',
     topic: 'Operator Overloading',
     priority: 'Low',
-    docUrl: `${DOCS}/structs/operator-support/#support-unary-operators`,
+    docUrl: `${DOCS}/structs/operator-support/#add-unary-operator-support`,
     file: 'src/offset.mojo',
     description:
       'Applying `-o` to an `Offset` should flip its sign, but `Offset` doesn’t ' +
@@ -1583,7 +1686,7 @@ def main():
       'the unary `-x` by calling `x.__neg__()`, which returns a new value — so ' +
       'add `__neg__`, returning a new `Offset` built from the negated field.\n\n' +
       'Example:\n```\ndef __neg__(self) -> Self:\n    return Self(-self.field)\n```',
-    starter: `struct Offset(Copyable, Movable):
+    starter: `struct Offset(Copyable):
     var v: Int
 
     def __init__(out self, v: Int):
@@ -1604,15 +1707,16 @@ def main():
     title: 'Compare two firmware versions',
     topic: 'Operator Overloading',
     priority: 'Medium',
-    docUrl: `${DOCS}/structs/operator-support/#support-comparisons`,
+    docUrl: `${DOCS}/structs/operator-support/#support-type-equality-checks`,
     file: 'src/version.mojo',
     description:
       'Comparing two `Version` values with `==` should test their major numbers, ' +
       'but the struct has no `__eq__`, so `a == b` will not compile. Mojo ' +
       'evaluates `a == b` by calling `a.__eq__(b)`, so `==` works only once the ' +
-      'type defines that dunder. Add the equality dunder.\n\n' +
+      'type defines that dunder (or conforms to `Equatable`, which can supply a ' +
+      'field-by-field default). Add the equality dunder.\n\n' +
       'Example:\n```\ndef __eq__(self, other: Self) -> Bool:\n    return self.field == other.field\n```',
-    starter: `struct Version(Copyable, Movable):
+    starter: `struct Version(Copyable):
     var major: Int
 
     def __init__(out self, major: Int):
@@ -1633,7 +1737,7 @@ def main():
     title: 'Index into a frame with a subscript',
     topic: 'Operator Overloading',
     priority: 'Medium',
-    docUrl: `${DOCS}/structs/operator-support/#support-subscripting`,
+    docUrl: `${DOCS}/structs/operator-support/#unlock-subscript-access`,
     file: 'src/frame.mojo',
     description:
       'Reading `f[1]` should return the second channel of a `Frame`, but the ' +
@@ -1641,7 +1745,7 @@ def main():
       'Mojo turns a subscript read `obj[i]` into `obj.__getitem__(i)`, so add ' +
       '`__getitem__` returning the field for index 0, 1, or 2.\n\n' +
       'Example:\n```\ndef __getitem__(self, i: Int) -> Int:\n    ...\n```',
-    starter: `struct Frame(Copyable, Movable):
+    starter: `struct Frame(Copyable):
     var a: Int
     var b: Int
     var c: Int
@@ -1672,7 +1776,7 @@ def main():
       'imports it, so the name is undefined. `from module import name` brings a ' +
       'single member of a module into scope. Add the import at the top of the ' +
       'file.\n\n' +
-      'Example: `from std.someModule import someName`',
+      'Example: `from std.some_module import some_name`',
     starter: `def main():
     var root = sqrt(144.0)
     print("Square root:", root)
@@ -1696,7 +1800,7 @@ def main():
       'arguments are read-only by default, so the in-place update will not ' +
       'compile. Mark the `total` argument `mut` so the function can write back to ' +
       'it.\n\n' +
-      'Example: `def someFunction(mut someArg: Int):`',
+      'Example: `def some_function(mut some_arg: Int):`',
     starter: `def record_sample(total: Int, sample: Int):
     total += sample
 
@@ -1728,7 +1832,7 @@ def main():
       'We don’t need `cells` after the call, so hand ownership to the loader with ' +
       'the `^` transfer sigil: it ends the variable’s lifetime and moves the value ' +
       'into the `var` argument instead of copying it.\n\n' +
-      'Example: `var result = someFunction(someValue^)`',
+      'Example: `var result = some_function(some_value^)`',
     starter: `def load_map(var cells: List[Int]) -> Int:
     return len(cells)
 
@@ -1758,10 +1862,10 @@ def main():
       'a copy, and must name the origin it borrows from. ' +
       "`borrow_depth` returns a mutable `ref` so callers can edit the queue's " +
       '`depth` in place, but the origin in the return type names the whole `self` ' +
-      'instead of the field actually returned, so the borrow checker rejects it. ' +
+      'instead of the field actually returned, so the compiler rejects the return with an incompatible-origin error. ' +
       'Make the origin point at the same storage the `return` does.\n\n' +
       'Example: a method returning `self.field` should be typed `ref [self.field] T`, not `ref [self] T`.',
-    starter: `struct CommandQueue(Copyable, Movable):
+    starter: `struct CommandQueue(Copyable):
     var depth: Int
 
     def __init__(out self, depth: Int):
@@ -1782,18 +1886,18 @@ def main():
   },
   {
     id: 'MQ-702',
-    concept: "By the end of a constructor, all of the struct's fields must be initialized",
-    title: 'Initialize every field in the constructor',
+    concept: "By the end of an initializer, all of the struct's fields must be initialized",
+    title: 'Initialize every field in the initializer',
     topic: 'Value Lifecycle',
     priority: 'High',
-    docUrl: `${DOCS}/lifecycle/life/#field-initialization`,
+    docUrl: `${DOCS}/lifecycle/life/#constructor`,
     file: 'src/waypoint_init.mojo',
     description:
-      'A constructor must leave every field initialized before it returns. ' +
+      'An initializer must leave every field initialized before it returns. ' +
       '`Waypoint.__init__` sets `x` but forgets `y`, so the struct is incompletely ' +
       'constructed and the build fails. Assign `y` too.\n\n' +
       'Example: `self.field = field`',
-    starter: `struct Waypoint(Copyable, Movable):
+    starter: `struct Waypoint(Copyable):
     var x: Int
     var y: Int
 
@@ -1811,22 +1915,22 @@ def main():
   {
     id: 'MQ-703',
     concept: "Like any method, `__init__()` can be overloaded to construct the object from different arguments",
-    title: 'Re-badge a RobotConfig with a second constructor',
+    title: 'Re-badge a RobotConfig with a second initializer',
     topic: 'Value Lifecycle',
     priority: 'High',
-    docUrl: `${DOCS}/lifecycle/life/#overloading-the-constructor`,
+    docUrl: `${DOCS}/lifecycle/life/#overloading-initializers`,
     file: 'src/robot_config.mojo',
     description:
       '`RobotConfig` can be built from an explicit `max_rate`, but the fleet ' +
       'console also re-badges an existing config under a new name — ' +
-      '`RobotConfig("arm", base)` — and no constructor accepts that yet, so the ' +
+      '`RobotConfig("arm", base)` — and no initializer accepts that yet, so the ' +
       'program will not compile. Add a second `__init__` that takes a name and an ' +
       'existing `RobotConfig` template, copying the template’s `max_rate`.\n\n' +
-      'Because the two constructors take different second-argument types (`Int` ' +
+      'Because the two initializers take different second-argument types (`Int` ' +
       'vs `RobotConfig`), they must be separate overloads — a default argument ' +
-      'can’t express both. Every constructor must assign all fields.\n\n' +
+      'can’t express both. Every initializer must assign all fields.\n\n' +
       'Example:\n```\ndef __init__(out self, name: String, template: Self):\n    self.name = name\n    self.max_rate = template.max_rate\n```',
-    starter: `struct RobotConfig(Copyable, Movable):
+    starter: `struct RobotConfig(Copyable):
     var name: String
     var max_rate: Int
 
@@ -1842,23 +1946,23 @@ def main():
     print("Robot:", arm.name, "max_rate:", arm.max_rate)
 `,
     validation: { kind: 'run', expectedStdout: 'Robot: arm max_rate: 512' },
-    hint: 'The console builds a config from a name plus an existing config (a template), but the only constructor expects a name and an `Int`. A struct can have more than one `__init__`: add a second `__init__(out self, name: String, template: Self)` that keeps the new name and copies `max_rate` from the template — and make sure it assigns every field.',
+    hint: 'The console builds a config from a name plus an existing config (a template), but the only initializer expects a name and an `Int`. A struct can have more than one `__init__`: add a second `__init__(out self, name: String, template: Self)` that keeps the new name and copies `max_rate` from the template — and make sure it assigns every field.',
   },
   {
     id: 'MQ-704',
-    concept: "An `@implicit` single-argument constructor enables implicit conversion from the source type",
+    concept: "An `@implicit` single-argument initializer enables implicit conversion from the source type",
     title: 'Allow implicit construction of Celsius',
     topic: 'Value Lifecycle',
     priority: 'Medium',
-    docUrl: `${DOCS}/lifecycle/life/#constructors-and-implicit-conversion`,
+    docUrl: `${DOCS}/lifecycle/life/#initializers-and-implicit-conversion`,
     file: 'src/celsius.mojo',
     description:
       '`report` expects a `Celsius`, but `main` passes a bare `Int` and relies on ' +
-      'the single-argument constructor to convert it. That only happens when the ' +
-      'constructor is marked `@implicit`; without it the call will not compile. ' +
+      'the single-argument initializer to convert it. That only happens when the ' +
+      'initializer is marked `@implicit`; without it the call will not compile. ' +
       'Add the decorator.\n\n' +
       'Example:\n```\n@implicit\ndef __init__(out self, x: Int):\n    ...\n```',
-    starter: `struct Celsius(Copyable, Movable):
+    starter: `struct Celsius(Copyable):
     var deg: Int
 
     def __init__(out self, deg: Int):
@@ -1877,7 +1981,7 @@ def main():
   },
   {
     id: 'MQ-705',
-    concept: "Conforming to `Copyable` gives a type a compiler-synthesized `.copy()` method",
+    concept: "Conforming to `Copyable` gives a type a `.copy()` method, backed by a compiler-synthesized fieldwise copy initializer",
     title: 'Give ScanBuffer an independent copy',
     topic: 'Value Lifecycle',
     priority: 'High',
@@ -1914,7 +2018,7 @@ def main():
     print("working size:", working.size())
 `,
     validation: { kind: 'run', expectedStdout: 'snapshot size: 3\nworking size: 4' },
-    hint: 'The recorder asks the buffer for a copy of itself, but the struct never declared it can be copied. Add the `Copyable` trait to the struct header; the compiler then synthesizes a `.copy()` that duplicates each field — including the `List`, which it deep-copies — so the buffers stay independent. No copy constructor needed.',
+    hint: 'The recorder asks the buffer for a copy of itself, but the struct never declared it can be copied. Add the `Copyable` trait to the struct header; the compiler then synthesizes a `.copy()` that duplicates each field — including the `List`, which it deep-copies — so the buffers stay independent. No hand-written copy initializer needed.',
   },
   {
     id: 'MQ-706',
@@ -1929,8 +2033,8 @@ def main():
       '`Copyable`, which requires an explicit `.copy()`; a plain assignment needs ' +
       'the stronger `ImplicitlyCopyable`. Add that trait so `var b = a` ' +
       'compiles.\n\n' +
-      'Example: `struct S(ImplicitlyCopyable, Movable):`',
-    starter: `struct Reading(Copyable, Movable):
+      'Example: `struct S(ImplicitlyCopyable):`',
+    starter: `struct Reading(Copyable):
     var v: Int
 
     def __init__(out self, v: Int):
@@ -1947,17 +2051,18 @@ def main():
   },
   {
     id: 'MQ-710',
-    concept: "Mojo calls a value's `__deinit__()` destructor when its lifetime ends (ASAP, last-use destruction)",
+    concept: "Mojo calls a value's `__deinit__()` deinitializer when its lifetime ends (ASAP, last-use destruction)",
     title: 'Release the motor handle on teardown',
     topic: 'Value Lifecycle',
     priority: 'High',
-    docUrl: `${DOCS}/lifecycle/death/#destructor`,
+    docUrl: `${DOCS}/lifecycle/death/#custom-deinitializers`,
     file: 'src/motor_handle.mojo',
     description:
-      'A `MotorHandle` should release its motor as soon as it goes out of scope ' +
-      '(RAII), but right now no cleanup ever happens, so the release line is ' +
-      'missing from the audit log. Add a destructor that prints the release; it ' +
-      'runs automatically at end of scope.\n\n' +
+      'A `MotorHandle` should release its motor once it is no longer needed, but ' +
+      'right now no cleanup ever happens, so the release line is missing from ' +
+      'the audit log. Add a deinitializer that prints the release. Mojo runs it ' +
+      'automatically right after the value\'s last use (ASAP destruction), not ' +
+      'at the end of the scope.\n\n' +
       'Example:\n```\ndef __deinit__(deinit self):\n    print("Closed connection", self.conn_id)\n```',
     starter: `struct MotorHandle:
     var motor_id: Int
@@ -1980,7 +2085,7 @@ def main():
       kind: 'run',
       expectedStdout: 'Acquired motor 0\nDriving with motor 0\nReleased motor 0\nScheduler idle',
     },
-    hint: 'The handle announces when it is acquired but never when it is released, so the release line is missing. Mojo runs a struct’s destructor automatically the moment a value leaves scope — add that destructor and have it print the release. Note its `self` must be taken specially as `deinit self`, not a plain `self`.',
+    hint: 'The handle announces when it is acquired but never when it is released, so the release line is missing. Mojo runs a struct’s `__deinit__` automatically as soon as the value is no longer used — add that deinitializer and have it print the release. Note its `self` must be taken specially as `deinit self`, not a plain `self`.',
   },
   {
     id: 'MQ-801',
@@ -2044,7 +2149,7 @@ def main():
     title: 'Bake the control gain in at compile time',
     topic: 'Parameterization',
     priority: 'High',
-    docUrl: `${DOCS}/parameters/#parameterized-functions`,
+    docUrl: `${DOCS}/parameters/#parameters-and-generics`,
     file: 'src/gain.mojo',
     description:
       'This helper multiplies a value by a fixed control gain that should be baked ' +
@@ -2053,7 +2158,7 @@ def main():
       'arguments. Here `factor` is declared as an ordinary runtime argument while ' +
       'callers pass it in square brackets — so it will not compile. Move ' +
       "`factor` into the function's compile-time parameter list.\n\n" +
-      'Example: `def scaleBy[k: Int](x: Int) -> Int:`',
+      'Example: `def scale_by[k: Int](x: Int) -> Int:`',
     starter: `def scale(factor: Int, x: Int) -> Int:
     return x * factor
 
@@ -2080,7 +2185,7 @@ def main():
       'that compiles. Add a compile-time parameter `[size: Int]` to the struct. ' +
       'Parameters are also accessible on instances as `b.size`.\n\n' +
       'Example: `struct Thing[n: Int]:`',
-    starter: `struct Buffer(Copyable, Movable):
+    starter: `struct Buffer(Copyable):
     def __init__(out self):
         pass
 
@@ -2102,7 +2207,7 @@ def main():
     title: 'Register Lidar as a Sensor',
     topic: 'Traits',
     priority: 'High',
-    docUrl: `${DOCS}/traits/#adding-traits-to-structs`,
+    docUrl: `${DOCS}/traits/#conforming-to-a-trait`,
     file: 'src/sensors.mojo',
     description:
       '`announce` only accepts types that conform to the `Sensor` trait — a set ' +
@@ -2143,7 +2248,7 @@ def main():
     title: 'Give the trait a default greeting',
     topic: 'Traits',
     priority: 'Medium',
-    docUrl: `${DOCS}/traits/#default-method-implementations`,
+    docUrl: `${DOCS}/traits/#default-implementations`,
     file: 'src/trait_default.mojo',
     description:
       'A trait method can carry a default implementation, which conforming ' +
@@ -2183,7 +2288,7 @@ def main():
     title: 'Make the track report its length',
     topic: 'Traits',
     priority: 'Medium',
-    docUrl: `${DOCS}/traits/#the-sized-trait`,
+    docUrl: 'https://mojolang.org/docs/std/builtin/len/Sized/',
     file: 'src/track_sized.mojo',
     description:
       '`len(t)` only works on types that conform to the `Sized` trait by ' +
@@ -2213,7 +2318,7 @@ def main():
     title: 'Make the telemetry logger generic',
     topic: 'Generics',
     priority: 'High',
-    docUrl: `${DOCS}/generics/#setting-generic-parameter-bounds`,
+    docUrl: `${DOCS}/generics/#simplified-conformance-syntax-with-some`,
     file: 'src/telemetry_log.mojo',
     description:
       '`log_value` should accept any printable value, but it references a type ' +
@@ -2247,7 +2352,7 @@ def main():
       '`comptime assert` statement to reject an odd motor count at compile time. ' +
       'It is currently instantiated with an odd value, so the build fails. Pick a ' +
       'motor count the assertion accepts — do not weaken the guard.\n\n' +
-      'Example: `make_drive[someEvenN]()`',
+      'Example: `make_drive[some_even_n]()`',
     starter: `def make_drive[num_motors: Int]() -> Int:
     # The drive train must pair motors across an even motor count.
     comptime assert num_motors % 2 == 0, "num_motors must be even"
@@ -2275,7 +2380,7 @@ def main():
       'the runtime `print`. But the caller feeds it a runtime `var`, and the ' +
       'compiler rejects passing a dynamic value into a parameter list. Bind the ' +
       'dimension as a compile-time constant instead.\n\n' +
-      'Example: declare `comptime SOME_DIM = 8` and pass it as `someFunction[SOME_DIM]()`.',
+      'Example: declare `comptime SOME_DIM = 8` and pass it as `some_function[SOME_DIM]()`.',
     starter: `def transform_size[dim: Int]() -> Int:
     # a dim x dim transform matrix has dim * dim entries
     return dim * dim
@@ -2299,13 +2404,13 @@ def main():
     description:
       'Compile-time reflection with `reflect[T]` inspects a type and returns a ' +
       'handle you can query for its members. The config inspector reflects over ' +
-      '`RobotConfig` with `reflect[...]()` and should report how many fields it ' +
+      '`RobotConfig` with `reflect[RobotConfig]` and should report how many fields it ' +
       'has (3). But it calls a reflection method that does not exist, so the ' +
       'build fails. Call the method on the reflected handle that returns the ' +
       'field count.\n\n' +
-      'Example: `comptime r = reflect[SomeType]()`. Check the linked reflection ' +
+      'Example: `comptime n = reflect[SomeType].name()`. Check the linked reflection ' +
       'docs for the accessor that returns the field count.',
-    starter: `struct RobotConfig(Copyable, Movable):
+    starter: `struct RobotConfig(Copyable):
     var max_speed: Int
     var wheel_radius: Int
     var num_sensors: Int
@@ -2329,7 +2434,7 @@ def main():
     title: 'Allocate the encoder-sample scratch buffer',
     topic: 'Pointers',
     priority: 'High',
-    docUrl: `${DOCS}/pointers/unsafe-pointers/#allocating-memory`,
+    docUrl: 'https://mojolang.org/docs/std/memory/alloc/unsafe_alloc/',
     file: 'src/scratch.mojo',
     description:
       '`unsafe_alloc[T](n)` reserves space for `n` uninitialized values of ' +
@@ -2361,18 +2466,18 @@ def main():
     title: 'Read the right slot of the scratch buffer',
     topic: 'Pointers',
     priority: 'High',
-    docUrl: `${DOCS}/pointers/unsafe-pointers/#storing-multiple-values`,
+    docUrl: `${DOCS}/pointers/using-pointers/#storing-multiple-values`,
     file: 'src/ptr_index.mojo',
     description:
       'When a pointer has space for multiple values, `ptr[unsafe_offset=i]` accesses ' +
       'element at offset `i`. This two-slot heap buffer stores 10 at index 0 and ' +
-      '20 at index 1, then should print the second slot (20). But it reads index ' +
+      '20 at index 1 (initialized with `unsafe_write`), then should print the second slot (20). But it reads index ' +
       '0, so it prints 10. Fix the index it dereferences.\n\n' +
       'Example: `ptr[unsafe_offset=i]` reads the element at offset `i`.',
     starter: `def main():
     var ptr = alloc[Int]({count = 2}).unsafe_leak()
-    ptr[unsafe_offset=0] = 10
-    ptr[unsafe_offset=1] = 20
+    ptr.unsafe_offset(0).unsafe_write(10)
+    ptr.unsafe_offset(1).unsafe_write(20)
     print("second:", ptr[unsafe_offset=0])
     ptr.unsafe_free()
 `,
@@ -2385,7 +2490,7 @@ def main():
     title: 'Make the odometry test pass',
     topic: 'Testing',
     priority: 'High',
-    docUrl: `${DOCS}/errors/`,
+    docUrl: 'https://mojolang.org/docs/std/testing/testing/assert_equal/',
     file: 'src/odometry_test.mojo',
     description:
       'A unit test checks `total_distance(near, far)` with `assert_equal`, which ' +
@@ -2418,7 +2523,7 @@ def main() raises:
     title: 'Assert that bad input raises',
     topic: 'Testing',
     priority: 'Medium',
-    docUrl: `${DOCS}/errors/`,
+    docUrl: 'https://mojolang.org/docs/std/testing/testing/assert_raises/',
     file: 'src/test_raises.mojo',
     description:
       '`clamp` raises on a negative value. `assert_raises()` from the `testing` ' +

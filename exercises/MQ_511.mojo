@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: A unary operator like `-x` calls `__neg__()`, returning a new value representing the result
-struct Offset(Copyable, Movable):
+struct Offset(Copyable):
     var v: Int
 
     def __init__(out self, v: Int):

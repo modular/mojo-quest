@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Conforming to `Copyable` gives a type a compiler-synthesized `.copy()` method
+# Mojo concept: Conforming to `Copyable` gives a type a `.copy()` method, backed by a compiler-synthesized fieldwise copy initializer
 struct ScanBuffer(Copyable):
     var samples: List[Int]
 

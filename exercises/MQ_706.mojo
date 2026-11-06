@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: The `ImplicitlyCopyable` trait lets the compiler copy a value on a plain assignment (`var b = a`)
-struct Reading(ImplicitlyCopyable, Movable):
+struct Reading(ImplicitlyCopyable):
     var v: Int
 
     def __init__(out self, v: Int):

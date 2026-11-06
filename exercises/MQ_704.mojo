@@ -10,8 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: An `@implicit` single-argument constructor enables implicit conversion from the source type
-struct Celsius(Copyable, Movable):
+# Mojo concept: An `@implicit` single-argument initializer enables implicit conversion from the source type
+struct Celsius(Copyable):
     var deg: Int
 
     @implicit

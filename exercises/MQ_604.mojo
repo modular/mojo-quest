@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: A `ref` return value must name an origin; it returns a reference to an existing value, not a copy
-struct CommandQueue(Copyable, Movable):
+struct CommandQueue(Copyable):
     var depth: Int
 
     def __init__(out self, depth: Int):

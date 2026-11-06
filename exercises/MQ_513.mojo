@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Implement `__getitem__()` to support subscript reads (`obj[i]`)
-struct Frame(Copyable, Movable):
+struct Frame(Copyable):
     var a: Int
     var b: Int
     var c: Int

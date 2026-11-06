@@ -11,9 +11,6 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: An `Optional` represents a value that may or may not be present
-from std.collections import Optional
-
-
 def cache_lookup(sensor_id: Int) -> Optional[Int]:
     if sensor_id == 7:
         return 512

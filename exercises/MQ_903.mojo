@@ -13,7 +13,7 @@
 # Mojo concept: With space for multiple values, `ptr[unsafe_offset=i]` accesses the element at offset `i`
 def main():
     var ptr = alloc[Int]({count = 2}).unsafe_leak()
-    ptr[unsafe_offset=0] = 10
-    ptr[unsafe_offset=1] = 20
+    ptr.unsafe_offset(0).unsafe_write(10)
+    ptr.unsafe_offset(1).unsafe_write(20)
     print("second:", ptr[unsafe_offset=1])
     ptr.unsafe_free()

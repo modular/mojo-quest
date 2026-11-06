@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: Use `reflect[T]` to inspect a type at compile time, querying members like `field_count()`
-struct RobotConfig(Copyable, Movable):
+struct RobotConfig(Copyable):
     var max_speed: Int
     var wheel_radius: Int
     var num_sensors: Int

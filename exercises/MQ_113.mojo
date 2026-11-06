@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
-# Mojo concept: Implement separate versions of a function with different argument types to "overload" it
+# Mojo concept: Implement separate versions of a function with different argument types or counts to "overload" it
 def footprint(side: Int) -> Int:
     return side * side
 

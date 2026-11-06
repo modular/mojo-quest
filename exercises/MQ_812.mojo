@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: A parameterized struct adds compile-time parameters in `[]` after its name; they are accessible on instances (e.g. `b.size`)
-struct Buffer[size: Int](Copyable, Movable):
+struct Buffer[size: Int](Copyable):
     def __init__(out self):
         pass
 

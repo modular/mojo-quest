@@ -16,18 +16,59 @@
  *
  *   npm run verify:exercises                 # pinned MOJO_COMPILER
  *   MOJO_COMPILER=mojo_nightly npm run verify:exercises   # preview a newer build
+ *   npm run verify:exercises -- --dump <dir>   # also save every build/run log
+ *
+ * On the pinned compiler, a solution that compiles with warnings fails: a
+ * deprecation today is a removal in the next release. On any other compiler
+ * the warnings are only reported. `--dump` writes each starter's and
+ * solution's compiler and program output to <dir>, so two toolchains can be
+ * diffed to confirm every starter still fails for the bug its ticket teaches.
  *
  * Exits non-zero if any exercise fails, so it works in CI.
  */
-import { readFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { issues } from '../src/data/issues'
-import { compileAndRun, MOJO_COMPILER } from '../src/lib/compile'
+import { compileAndRun, MOJO_COMPILER, type RunResult } from '../src/lib/compile'
 import { checkSolution } from '../src/lib/validate'
 
 const compilerId = process.env.MOJO_COMPILER || MOJO_COMPILER
 const SOLUTIONS_DIR = join(process.cwd(), 'exercises')
-const CONCURRENCY = 6
+// Compiler Explorer rate-limits bursts with HTTP 429, so keep this low and
+// back off on 429 rather than reporting it as an exercise failure.
+const CONCURRENCY = 3
+const MAX_RETRIES = 6
+const strictWarnings = compilerId === MOJO_COMPILER
+const dumpFlag = process.argv.indexOf('--dump')
+const DUMP_DIR = dumpFlag >= 0 ? process.argv[dumpFlag + 1] : undefined
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+async function run(source: string): Promise<RunResult> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await compileAndRun(source, undefined, compilerId)
+    if (!res.error?.includes('HTTP 429') || attempt >= MAX_RETRIES) return res
+    await sleep(2000 * 2 ** attempt)
+  }
+}
+
+function dump(id: string, which: 'solution' | 'starter', res: RunResult) {
+  if (!DUMP_DIR) return
+  const text = [
+    `error: ${res.error ?? ''}`,
+    `compiled: ${res.compiled}  exitCode: ${res.exitCode}  timedOut: ${res.timedOut}`,
+    '--- build stderr ---',
+    res.buildStderr,
+    '--- stdout ---',
+    res.stdout,
+    '--- stderr ---',
+    res.stderr,
+  ].join('\n')
+  writeFileSync(join(DUMP_DIR, `${id}.${which}.txt`), text + '\n')
+}
+
+const warningLines = (res: RunResult) =>
+  res.buildStderr.split('\n').filter((l) => /\bwarning:/.test(l))
 
 type Row = { id: string; ok: boolean; detail: string }
 
@@ -60,8 +101,13 @@ async function checkOne(issue: (typeof issues)[number]): Promise<Row> {
     }
   }
 
+  // Run both up front so --dump captures the starter even when the solution fails.
+  const solRes = await run(solution)
+  const startRes = await run(issue.starter)
+  dump(issue.id, 'solution', solRes)
+  dump(issue.id, 'starter', startRes)
+
   // 1. The completed solution must satisfy the validation.
-  const solRes = await compileAndRun(solution, undefined, compilerId)
   const solOutcome = checkSolution(issue, solRes, solution)
   if (!solOutcome.passed) {
     return {
@@ -73,18 +119,30 @@ async function checkOne(issue: (typeof issues)[number]): Promise<Row> {
     }
   }
 
-  // 2. The starter must still be broken.
-  const startRes = await compileAndRun(issue.starter, undefined, compilerId)
+  // 2. The solution must compile cleanly.
+  const warnings = warningLines(solRes)
+  const warningDetail = warnings.map((l) => `\n      ${l}`).join('')
+  if (warnings.length > 0 && strictWarnings) {
+    return {
+      id: issue.id,
+      ok: false,
+      detail: `SOLUTION compiles with ${warnings.length} warning(s)${warningDetail}`,
+    }
+  }
+
+  // 3. The starter must still be broken.
   const startOutcome = checkSolution(issue, startRes, issue.starter)
   if (startOutcome.passed) {
     return { id: issue.id, ok: false, detail: 'STARTER already passes — puzzle is not broken' }
   }
 
-  return { id: issue.id, ok: true, detail: `${issue.validation.kind} ✓` }
+  const note = warnings.length > 0 ? ` (${warnings.length} warning(s))${warningDetail}` : ''
+  return { id: issue.id, ok: true, detail: `${issue.validation.kind} ✓${note}` }
 }
 
 async function main() {
   console.log(`Verifying ${issues.length} exercises against ${compilerId}…\n`)
+  if (DUMP_DIR) mkdirSync(DUMP_DIR, { recursive: true })
   const rows: Row[] = []
   let nextIndex = 0
   async function worker() {

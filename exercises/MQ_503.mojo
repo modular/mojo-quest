@@ -11,7 +11,7 @@
 # limitations under the License.
 # ===----------------------------------------------------------------------=== #
 # Mojo concept: To let a method mutate the instance, declare its receiver as `mut self`
-struct FrameCounter(Copyable, Movable):
+struct FrameCounter(Copyable):
     var count: Int
 
     def __init__(out self, count: Int):
